@@ -53,9 +53,15 @@ public class VendaService {
         validarPedidoAberto(pedido);
         EstoqueValidator.validarEstoqueSuficiente(produto, quantidade);
 
+        // Garante que o preço de venda é válido
+        if (precoVenda <= 0) {
+            throw new ValidationException("Preço de venda inválido.");
+        }
+
         ItemPedido item = new ItemPedido(produto.getId(), produto, quantidade, precoVenda);
         pedido.adicionarItem(item);
 
+        // Atualiza estoque
         produto.setQuantidadeEstoque(produto.getQuantidadeEstoque() - quantidade);
         produtoRepository.save(produto);
         pedidoRepository.save(pedido);
@@ -67,7 +73,7 @@ public class VendaService {
         ItemPedido item = pedido.getItens().stream()
                 .filter(i -> i.getId().equals(itemId))
                 .findFirst()
-                .orElseThrow(() -> new ValidationException("Item não encontrado"));
+                .orElseThrow(() -> new ValidationException("Item não encontrado no pedido."));
 
         // Devolve a quantidade ao estoque do produto
         Produto produto = item.getProduto();
@@ -78,24 +84,23 @@ public class VendaService {
         pedidoRepository.save(pedido);
     }
 
-
     public void alterarQuantidadeItem(Pedido pedido, Long itemId, int novaQuantidade) {
         validarPedidoAberto(pedido);
 
         ItemPedido item = pedido.getItens().stream()
                 .filter(i -> i.getId().equals(itemId))
                 .findFirst()
-                .orElseThrow(() -> new ValidationException("Item não encontrado"));
+                .orElseThrow(() -> new ValidationException("Item não encontrado no pedido."));
 
         int delta = novaQuantidade - item.getQuantidade(); // diferença de quantidade
 
-        // Se delta positivo -> precisa de mais estoque
-        // Se delta negativo -> devolve estoque
         if (delta > 0) {
+            // precisa de mais estoque
             EstoqueValidator.validarEstoqueSuficiente(item.getProduto(), delta);
             item.getProduto().setQuantidadeEstoque(item.getProduto().getQuantidadeEstoque() - delta);
         } else if (delta < 0) {
-            item.getProduto().setQuantidadeEstoque(item.getProduto().getQuantidadeEstoque() - delta); // delta é negativo, então adiciona
+            // devolve estoque
+            item.getProduto().setQuantidadeEstoque(item.getProduto().getQuantidadeEstoque() - delta); // delta é negativo
         }
 
         item.setQuantidade(novaQuantidade);
@@ -113,7 +118,7 @@ public class VendaService {
 
     public void pagarPedido(Pedido pedido) {
         if (pedido.getStatus() != StatusPedido.AGUARDANDO_PAGAMENTO) {
-            throw new ValidationException("Pedido deve estar aguardando pagamento antes de pagar.");
+            throw new ValidationException("Pedido deve estar 'AGUARDANDO PAGAMENTO' antes de pagar.");
         }
         pedido.pagar(); // muda status para PAGO
         pedidoRepository.save(pedido);
@@ -122,7 +127,7 @@ public class VendaService {
 
     public void entregarPedido(Pedido pedido) {
         if (pedido.getStatus() != StatusPedido.PAGO) {
-            throw new ValidationException("Pedido deve estar pago antes de entregar.");
+            throw new ValidationException("Pedido deve estar 'PAGO' antes de entregar.");
         }
         pedido.entregar();
         pedidoRepository.save(pedido);
@@ -133,7 +138,7 @@ public class VendaService {
     private void validarPedidoAberto(Pedido pedido) {
         if (pedido == null) throw new ValidationException("Pedido não pode ser nulo.");
         if (pedido.getStatus() != StatusPedido.ABERTO) {
-            throw new ValidationException("Só é possível alterar pedidos ABERTOS.");
+            throw new ValidationException("Só é possível alterar pedidos com status 'ABERTO'.");
         }
     }
 }

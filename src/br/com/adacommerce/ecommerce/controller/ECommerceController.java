@@ -95,7 +95,7 @@ public class ECommerceController {
                 System.out.println("Erro: " + ve.getMessage());
             }
         } else {
-            Optional<Cliente> opt = clienteService.buscarClientePorId(idCliente);
+            Optional<Cliente> opt = clienteService.buscarPorId(idCliente);
             if (opt.isPresent()) {
                 clienteSelecionado = opt.get();
                 System.out.println("Cliente selecionado: " + clienteSelecionado.getNome());

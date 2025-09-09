@@ -21,10 +21,15 @@ public class ECommerceSystem {
         EmailNotificador notificador = new EmailNotificador();
 
         ClienteService clienteService = new ClienteService(clienteRepo);
-        ProdutoService produtoService = new ProdutoService(produtoRepo, notificador);
+
+        // agora passando os 3 parâmetros corretamente
+        ProdutoService produtoService = new ProdutoService(produtoRepo, notificador, pedidoRepo);
+
         VendaService vendaService = new VendaService(pedidoRepo, produtoRepo, notificador);
 
-        ECommerceController controller = new ECommerceController(clienteService, produtoService, vendaService, scanner);
+        ECommerceController controller = new ECommerceController(
+            clienteService, produtoService, vendaService, scanner
+        );
         controller.iniciar();
 
         scanner.close();

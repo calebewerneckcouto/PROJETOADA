@@ -22,20 +22,20 @@ public class Pedido implements Serializable {
         this.itens = new ArrayList<>();
     }
     
-    // Getters e Setters
+   
     public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; } // Corrigido: não retorna Long, apenas seta
+    public void setId(Long id) { this.id = id; } 
     public Cliente getCliente() { return cliente; }
     public LocalDateTime getDataCriacao() { return dataCriacao; }
     public StatusPedido getStatus() { return status; }
     public List<ItemPedido> getItens() { return itens; }
     
-    // Calcula o total do pedido
+  
     public double getValorTotal() {
         return itens.stream().mapToDouble(ItemPedido::getSubtotal).sum();
     }
     
-    // Adiciona item ao pedido
+   
     public void adicionarItem(ItemPedido item) {
         if (status != StatusPedido.ABERTO) {
             throw new IllegalStateException("Não é possível adicionar itens a um pedido " + status);
@@ -43,7 +43,7 @@ public class Pedido implements Serializable {
         itens.add(item);
     }
     
-    // Remove item do pedido
+  
     public void removerItem(Long itemId) {
         if (status != StatusPedido.ABERTO) {
             throw new IllegalStateException("Não é possível remover itens de um pedido " + status);
@@ -51,7 +51,7 @@ public class Pedido implements Serializable {
         itens.removeIf(item -> item.getId().equals(itemId));
     }
     
-    // Altera quantidade de um item
+  
     public void alterarQuantidadeItem(Long itemId, int novaQuantidade) {
         if (status != StatusPedido.ABERTO) {
             throw new IllegalStateException("Não é possível alterar a quantidade de itens de um pedido " + status);
@@ -66,7 +66,7 @@ public class Pedido implements Serializable {
         throw new IllegalArgumentException("Item não encontrado no pedido");
     }
     
-    // Finaliza pedido (aguardando pagamento)
+  
     public void finalizarPedido() {
         if (status != StatusPedido.ABERTO) {
             throw new IllegalStateException("Só é possível finalizar pedidos com status ABERTO");
@@ -79,7 +79,7 @@ public class Pedido implements Serializable {
         this.status = StatusPedido.AGUARDANDO_PAGAMENTO;
     }
     
-    // Pagar pedido
+  
     public void pagar() {
         if (status != StatusPedido.AGUARDANDO_PAGAMENTO) {
             throw new IllegalStateException("Só é possível pagar pedidos com status AGUARDANDO_PAGAMENTO");
@@ -87,7 +87,7 @@ public class Pedido implements Serializable {
         this.status = StatusPedido.PAGO;
     }
     
-    // Entregar pedido
+  
     public void entregar() {
         if (status != StatusPedido.PAGO) {
             throw new IllegalStateException("Só é possível entregar pedidos com status PAGO");
