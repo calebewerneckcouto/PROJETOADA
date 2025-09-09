@@ -8,10 +8,11 @@ import br.com.adacommerce.ecommerce.exceptions.ValidationException;
 import br.com.adacommerce.ecommerce.model.Cliente;
 import br.com.adacommerce.ecommerce.model.Pedido;
 import br.com.adacommerce.ecommerce.model.Produto;
-import br.com.adacommerce.ecommerce.model.StatusPedido;
 import br.com.adacommerce.ecommerce.service.ClienteService;
 import br.com.adacommerce.ecommerce.service.ProdutoService;
 import br.com.adacommerce.ecommerce.service.VendaService;
+import br.com.adacommerce.ecommerce.notifications.Notificador;
+import br.com.adacommerce.ecommerce.notifications.EmailNotificador;
 
 public class ECommerceController {
 
@@ -19,6 +20,7 @@ public class ECommerceController {
     private final ProdutoService produtoService;
     private final VendaService vendaService;
     private final Scanner scanner;
+    private final Notificador notificador;
 
     private Cliente clienteSelecionado;
     private Pedido pedidoAtual;
@@ -29,6 +31,7 @@ public class ECommerceController {
         this.produtoService = produtoService;
         this.vendaService = vendaService;
         this.scanner = scanner;
+        this.notificador = new EmailNotificador();
     }
 
     public void iniciar() {
@@ -138,12 +141,8 @@ public class ECommerceController {
                 String qtdStr = scanner.nextLine();
                 Integer qtd = null;
                 if (!qtdStr.isEmpty()) {
-                    try {
-                        qtd = Integer.parseInt(qtdStr);
-                    } catch (NumberFormatException e) {
-                        System.out.println("Quantidade inválida! Mantendo valor atual.");
-                        qtd = null;
-                    }
+                    try { qtd = Integer.parseInt(qtdStr); } 
+                    catch (NumberFormatException e) { qtd = null; }
                 }
 
                 produtoService.atualizarProduto(idProduto, 
@@ -162,6 +161,7 @@ public class ECommerceController {
         if (clienteSelecionado == null) { System.out.println("Selecione um cliente primeiro!"); return; }
         pedidoAtual = vendaService.criarPedido(clienteSelecionado);
         System.out.println("Pedido criado com ID: " + pedidoAtual.getId());
+        notificador.notificarPedidoCriado(clienteSelecionado, pedidoAtual);
     }
 
     private void adicionarProdutoAoPedido() {
@@ -170,12 +170,9 @@ public class ECommerceController {
             return; 
         }
 
-        // Mostra produtos disponíveis
         List<Produto> produtos = produtoService.listarProdutos();
-        if (produtos.isEmpty()) {
-            System.out.println("Nenhum produto cadastrado!");
-            return;
-        }
+        if (produtos.isEmpty()) { System.out.println("Nenhum produto cadastrado!"); return; }
+
         System.out.println("Produtos disponíveis:");
         produtos.forEach(p -> System.out.println(
             p.getId() + " - " + p.getNome() + " (Qtd: " + p.getQuantidadeEstoque() + ", Preço: " + p.getPreco() + ")"
@@ -197,6 +194,11 @@ public class ECommerceController {
 
             vendaService.adicionarItem(pedidoAtual, produto, qtd, produto.getPreco());
             System.out.println("Item adicionado!");
+
+            if (produto.getQuantidadeEstoque() - qtd <= 5) { 
+                notificador.notificarEstoqueBaixo(produto.getNome(), produto.getQuantidadeEstoque() - qtd);
+            }
+
         } catch (ValidationException | NumberFormatException e) {
             System.out.println("Erro: " + e.getMessage());
         }
@@ -209,6 +211,17 @@ public class ECommerceController {
             System.out.print("Nova quantidade: "); int qtd = Integer.parseInt(scanner.nextLine());
             vendaService.alterarQuantidadeItem(pedidoAtual, itemId, qtd);
             System.out.println("Quantidade atualizada!");
+
+            // Verifica estoque do produto atualizado
+            pedidoAtual.getItens().stream()
+                .filter(i -> i.getId().equals(itemId))
+                .findFirst()
+                .ifPresent(i -> {
+                    if (i.getProduto().getQuantidadeEstoque() <= 5) {
+                        notificador.notificarEstoqueBaixo(i.getProduto().getNome(), i.getProduto().getQuantidadeEstoque());
+                    }
+                });
+
         } catch (ValidationException | NumberFormatException e) {
             System.out.println("Erro: " + e.getMessage());
         }
@@ -231,6 +244,7 @@ public class ECommerceController {
             vendaService.pagarPedido(pedidoAtual);
             System.out.println("Pedido pago com sucesso!");
             mostrarResumoPedido(pedidoAtual);
+            notificador.notificarPagamentoAprovado(clienteSelecionado, pedidoAtual);
         } catch (ValidationException ve) {
             System.out.println("Não foi possível pagar o pedido: " + ve.getMessage());
         }
@@ -242,6 +256,7 @@ public class ECommerceController {
             vendaService.entregarPedido(pedidoAtual);
             System.out.println("Pedido entregue com sucesso!");
             mostrarResumoPedido(pedidoAtual);
+            notificador.notificarPedidoEntregue(clienteSelecionado, pedidoAtual);
         } catch (ValidationException ve) {
             System.out.println("Não foi possível entregar o pedido: " + ve.getMessage());
         }
