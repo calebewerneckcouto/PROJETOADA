@@ -1,7 +1,8 @@
-package br.com.adacommerce.ecommerce.configure; // ajuste para seu pacote
+package br.com.adacommerce.ecommerce.configure; 
 
 public enum Persistencia {
     MEMORIA,
-    ARQUIVO
-    // FUTURO: BANCO
+    ARQUIVO,
+    BANCO
+    
 }

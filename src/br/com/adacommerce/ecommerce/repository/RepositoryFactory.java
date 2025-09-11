@@ -2,8 +2,8 @@ package br.com.adacommerce.ecommerce.repository;
 
 import br.com.adacommerce.ecommerce.configure.Persistencia;
 import br.com.adacommerce.ecommerce.model.Cliente;
-import br.com.adacommerce.ecommerce.model.Produto;
 import br.com.adacommerce.ecommerce.model.Pedido;
+import br.com.adacommerce.ecommerce.model.Produto;
 
 public class RepositoryFactory {
 
@@ -17,6 +17,8 @@ public class RepositoryFactory {
         switch (tipo) {
             case ARQUIVO:
                 return new ClienteRepositoryFile();
+            case BANCO:
+                return new ClienteRepositoryDB();
             case MEMORIA:
             default:
                 return new ClienteRepositoryMemory();
@@ -27,6 +29,8 @@ public class RepositoryFactory {
         switch (tipo) {
             case ARQUIVO:
                 return new ProdutoRepositoryFile();
+            case BANCO:
+                return new ProdutoRepositoryDB();
             case MEMORIA:
             default:
                 return new ProdutoRepositoryMemory();
@@ -37,6 +41,8 @@ public class RepositoryFactory {
         switch (tipo) {
             case ARQUIVO:
                 return new PedidoRepositoryFile();
+            case BANCO:
+                return new PedidoRepositoryDB();
             case MEMORIA:
             default:
                 return new PedidoRepositoryMemory();
