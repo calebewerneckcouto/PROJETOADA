@@ -29,8 +29,10 @@ public class Cliente implements Serializable {
     public void setEmail(String email) { this.email = email; }
     public void setDocumento(String documento) { this.documento = documento; }
 
-    @Override
-    public String toString() {
-        return "Cliente [ID: " + id + ", Nome: " + nome + ", Email: " + email + ", Documento: " + documento + "]";
-    }
+	@Override
+	public String toString() {
+		return "Cliente [id=" + id + ", nome=" + nome + ", email=" + email + ", documento=" + documento + "]";
+	}
+
+   
 }

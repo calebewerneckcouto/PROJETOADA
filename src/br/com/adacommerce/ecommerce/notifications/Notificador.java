@@ -9,4 +9,6 @@ public interface Notificador {
     void notificarPagamentoAprovado(Cliente cliente, Pedido pedido);
     void notificarPedidoEntregue(Cliente cliente, Pedido pedido);
     void notificarEstoqueBaixo(String produtoNome, int quantidade);
+    void notificarPedidoAguardandoPagamento(Cliente cliente, Pedido pedido);
+
 }

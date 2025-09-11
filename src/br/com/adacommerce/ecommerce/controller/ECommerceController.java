@@ -8,7 +8,6 @@ import br.com.adacommerce.ecommerce.exceptions.ValidationException;
 import br.com.adacommerce.ecommerce.model.Cliente;
 import br.com.adacommerce.ecommerce.model.Pedido;
 import br.com.adacommerce.ecommerce.model.Produto;
-import br.com.adacommerce.ecommerce.model.StatusPedido;
 import br.com.adacommerce.ecommerce.notifications.EmailNotificador;
 import br.com.adacommerce.ecommerce.notifications.Notificador;
 import br.com.adacommerce.ecommerce.service.ClienteService;
@@ -51,7 +50,7 @@ public class ECommerceController {
                 case "8": entregarPedido(); break;
                 case "9": mostrarPedidosFinalizados(); break;
                 case "10": removerItemDoPedido(); break;
-                case "11": mostrarPedidosAbertos(); break;
+            
                 case "0": rodando = false; System.out.println("Saindo do sistema..."); break;
                 default: System.out.println("Opção inválida!");
             }
@@ -70,7 +69,7 @@ public class ECommerceController {
         System.out.println("8 - Entregar Pedido");
         System.out.println("9 - Mostrar pedidos finalizados");
         System.out.println("10 - Remover item do Pedido");
-        System.out.println("11 - Mostrar Pedidos em Aberto");
+       
         System.out.println("0 - Sair");
         System.out.print("Escolha uma opção: ");
     }
@@ -284,15 +283,12 @@ public class ECommerceController {
         else pedidos.forEach(this::mostrarResumoPedido);
     }
 
-    private void mostrarPedidosAbertos() {
-        List<Pedido> pedidos = vendaService.listarPedidosAbertos();
-        if (pedidos.isEmpty()) System.out.println("Nenhum pedido em aberto!");
-        else pedidos.forEach(this::mostrarResumoPedido);
-    }
+   
 
     private void mostrarResumoPedido(Pedido pedido) {
         System.out.println("\n=== RESUMO PEDIDO ID " + pedido.getId() + " ===");
         System.out.println("Cliente: " + pedido.getCliente().getNome());
+        System.out.println("Data de criação: " + pedido.getDataCriacao()); 
         pedido.getItens().forEach(i -> System.out.println(
                 i.getId() + " - " + i.getProduto().getNome() + " x" + i.getQuantidade() +
                 " = " + i.getPrecoVenda() * i.getQuantidade()
@@ -300,4 +296,5 @@ public class ECommerceController {
         System.out.println("Status: " + pedido.getStatus());
         System.out.println("Total: " + pedido.getValorTotal());
     }
+
 }

@@ -48,4 +48,19 @@ public class EmailNotificador implements Notificador {
         System.out.println("Por favor, reabastecer o estoque.");
         System.out.println("===============================");
     }
+
+    @Override
+    public void notificarPedidoAguardandoPagamento(Cliente cliente, Pedido pedido) {
+       
+        String mensagem = "Olá " + cliente.getNome() + ",\n"
+                         + "Seu pedido de ID " + pedido.getId() 
+                         + " foi finalizado e está aguardando pagamento.\n"
+                         + "Valor total: R$" + pedido.getValorTotal() + "\n"
+                         + "Data: " + pedido.getDataCriacao() + "\n"
+                         + "Obrigado por comprar conosco!";
+        
+        System.out.println("[E-MAIL] Enviando notificação para " + cliente.getEmail());
+        System.out.println(mensagem);
+    }
+
 }

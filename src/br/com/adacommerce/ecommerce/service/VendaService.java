@@ -32,11 +32,7 @@ public class VendaService {
         return pedidoRepository.save(new Pedido(null, cliente));
     }
 
-    public List<Pedido> listarPedidosAbertos() {
-        return pedidoRepository.findAll().stream()
-                .filter(p -> p.getStatus() == StatusPedido.ABERTO)
-                .collect(Collectors.toList());
-    }
+  
 
     public List<Pedido> listarPedidosFinalizados() {
         return pedidoRepository.findAll().stream()
@@ -102,10 +98,12 @@ public class VendaService {
         if (!pedido.podeFinalizar()) {
             throw new ValidationException("Não é possível finalizar pedido sem itens ou valor maior que zero.");
         }
+
         pedido.finalizarPedido();
         pedidoRepository.save(pedido);
         notificador.notificarPedidoCriado(pedido.getCliente(), pedido);
     }
+
 
     public void pagarPedido(Pedido pedido) {
         if (pedido.getStatus() != StatusPedido.AGUARDANDO_PAGAMENTO) {
