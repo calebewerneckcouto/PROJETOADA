@@ -5,14 +5,16 @@ import java.util.Optional;
 
 import br.com.adacommerce.ecommerce.exceptions.ValidationException;
 import br.com.adacommerce.ecommerce.model.Cliente;
-import br.com.adacommerce.ecommerce.repository.ClienteRepositoryFile;
+import br.com.adacommerce.ecommerce.repository.Repository;
 
 public class ClienteService {
-    private final ClienteRepositoryFile clienteRepository;
-    private Long proximoId = 1L;
+    private final Repository<Cliente, Long> clienteRepository;
+    private Long proximoId;
 
-    public ClienteService(ClienteRepositoryFile clienteRepository) {
+    
+    public ClienteService(Repository<Cliente, Long> clienteRepository) {
         this.clienteRepository = clienteRepository;
+        this.proximoId = clienteRepository.getNextId(); 
     }
 
     public Cliente cadastrarCliente(String nome, String email, String documento) {

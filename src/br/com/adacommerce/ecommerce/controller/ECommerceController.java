@@ -8,11 +8,12 @@ import br.com.adacommerce.ecommerce.exceptions.ValidationException;
 import br.com.adacommerce.ecommerce.model.Cliente;
 import br.com.adacommerce.ecommerce.model.Pedido;
 import br.com.adacommerce.ecommerce.model.Produto;
+import br.com.adacommerce.ecommerce.model.StatusPedido;
+import br.com.adacommerce.ecommerce.notifications.EmailNotificador;
+import br.com.adacommerce.ecommerce.notifications.Notificador;
 import br.com.adacommerce.ecommerce.service.ClienteService;
 import br.com.adacommerce.ecommerce.service.ProdutoService;
 import br.com.adacommerce.ecommerce.service.VendaService;
-import br.com.adacommerce.ecommerce.notifications.Notificador;
-import br.com.adacommerce.ecommerce.notifications.EmailNotificador;
 
 public class ECommerceController {
 
@@ -212,7 +213,7 @@ public class ECommerceController {
             vendaService.alterarQuantidadeItem(pedidoAtual, itemId, qtd);
             System.out.println("Quantidade atualizada!");
 
-            // Verifica estoque do produto atualizado
+           
             pedidoAtual.getItens().stream()
                 .filter(i -> i.getId().equals(itemId))
                 .findFirst()
@@ -239,16 +240,20 @@ public class ECommerceController {
     }
 
     private void pagarPedido() {
-        if (pedidoAtual == null) { System.out.println("Crie um pedido primeiro!"); return; }
+        if (pedidoAtual == null) { 
+            System.out.println("Crie um pedido primeiro!"); 
+            return; 
+        }
         try {
             vendaService.pagarPedido(pedidoAtual);
             System.out.println("Pedido pago com sucesso!");
             mostrarResumoPedido(pedidoAtual);
-            notificador.notificarPagamentoAprovado(clienteSelecionado, pedidoAtual);
         } catch (ValidationException ve) {
             System.out.println("Não foi possível pagar o pedido: " + ve.getMessage());
         }
     }
+
+
 
     private void entregarPedido() {
         if (pedidoAtual == null) { System.out.println("Crie um pedido primeiro!"); return; }

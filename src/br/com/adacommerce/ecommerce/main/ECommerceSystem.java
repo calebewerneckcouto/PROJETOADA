@@ -2,10 +2,13 @@ package br.com.adacommerce.ecommerce.main;
 
 import java.util.Scanner;
 
+import br.com.adacommerce.ecommerce.configure.Persistencia;
 import br.com.adacommerce.ecommerce.notifications.EmailNotificador;
-import br.com.adacommerce.ecommerce.repository.ClienteRepositoryFile;
-import br.com.adacommerce.ecommerce.repository.PedidoRepositoryFile;
-import br.com.adacommerce.ecommerce.repository.ProdutoRepositoryFile;
+import br.com.adacommerce.ecommerce.repository.Repository;
+import br.com.adacommerce.ecommerce.repository.RepositoryFactory;
+import br.com.adacommerce.ecommerce.model.Cliente;
+import br.com.adacommerce.ecommerce.model.Produto;
+import br.com.adacommerce.ecommerce.model.Pedido;
 import br.com.adacommerce.ecommerce.service.ClienteService;
 import br.com.adacommerce.ecommerce.service.ProdutoService;
 import br.com.adacommerce.ecommerce.service.VendaService;
@@ -15,21 +18,29 @@ public class ECommerceSystem {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        ClienteRepositoryFile clienteRepo = new ClienteRepositoryFile();
-        ProdutoRepositoryFile produtoRepo = new ProdutoRepositoryFile();
-        PedidoRepositoryFile pedidoRepo = new PedidoRepositoryFile();
+        
+        Persistencia tipo = Persistencia.ARQUIVO;
+        RepositoryFactory factory = new RepositoryFactory(tipo);
+
+      
+        Repository<Cliente, Long> clienteRepo = factory.getClienteRepository();
+        Repository<Produto, Long> produtoRepo = factory.getProdutoRepository();
+        Repository<Pedido, Long> pedidoRepo = factory.getPedidoRepository();
+
+        
         EmailNotificador notificador = new EmailNotificador();
 
+      
         ClienteService clienteService = new ClienteService(clienteRepo);
-
-        // agora passando os 3 parâmetros corretamente
-        ProdutoService produtoService = new ProdutoService(produtoRepo, notificador, pedidoRepo);
-
+        ProdutoService produtoService = new ProdutoService(produtoRepo, notificador); 
         VendaService vendaService = new VendaService(pedidoRepo, produtoRepo, notificador);
 
+      
         ECommerceController controller = new ECommerceController(
-            clienteService, produtoService, vendaService, scanner
+                clienteService, produtoService, vendaService, scanner
         );
+
+       
         controller.iniciar();
 
         scanner.close();
