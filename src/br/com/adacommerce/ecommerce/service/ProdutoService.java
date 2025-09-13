@@ -14,7 +14,7 @@ public class ProdutoService {
     private final Notificador notificador;
     private final int limiteAlertaEstoque = 5;
 
-    // só usado em memória
+   
     private Long proximoId;
 
     public ProdutoService(Repository<Produto, Long> produtoRepository, Notificador notificador) {
@@ -24,7 +24,7 @@ public class ProdutoService {
         try {
             this.proximoId = produtoRepository.getNextId();
         } catch (UnsupportedOperationException e) {
-            this.proximoId = null; // banco cuida do ID
+            this.proximoId = null; 
         }
     }
 

@@ -15,148 +15,159 @@ import br.com.adacommerce.ecommerce.validators.EstoqueValidator;
 
 public class VendaService {
 
-    private final Repository<Pedido, Long> pedidoRepository;
-    private final Repository<Produto, Long> produtoRepository;
-    private final Notificador notificador;
+	private final Repository<Pedido, Long> pedidoRepository;
+	private final Repository<Produto, Long> produtoRepository;
+	private final Notificador notificador;
 
-    // só usado em memória
-    private Long proximoPedidoId;
-    private Long proximoItemId;
+	private Long proximoPedidoId;
+	private Long proximoItemId;
 
-    public VendaService(Repository<Pedido, Long> pedidoRepository,
-                        Repository<Produto, Long> produtoRepository,
-                        Notificador notificador) {
-        this.pedidoRepository = pedidoRepository;
-        this.produtoRepository = produtoRepository;
-        this.notificador = notificador;
+	public VendaService(Repository<Pedido, Long> pedidoRepository, Repository<Produto, Long> produtoRepository,
+			Notificador notificador) {
+		this.pedidoRepository = pedidoRepository;
+		this.produtoRepository = produtoRepository;
+		this.notificador = notificador;
 
-        try {
-            this.proximoPedidoId = pedidoRepository.getNextId();
-        } catch (UnsupportedOperationException e) {
-            this.proximoPedidoId = null;
-        }
+		try {
+			this.proximoPedidoId = pedidoRepository.getNextId();
+		} catch (UnsupportedOperationException e) {
+			this.proximoPedidoId = null;
+		}
 
-        try {
-            this.proximoItemId = 1L; // para memória
-        } catch (UnsupportedOperationException e) {
-            this.proximoItemId = null;
-        }
-    }
+		try {
+			this.proximoItemId = 1L;
+		} catch (UnsupportedOperationException e) {
+			this.proximoItemId = null;
+		}
+	}
 
-    public Pedido criarPedido(Cliente cliente) {
-        if (cliente == null)
-            throw new ValidationException("Cliente não pode ser nulo.");
+	public Pedido criarPedido(Cliente cliente) {
+		if (cliente == null)
+			throw new ValidationException("Cliente não pode ser nulo.");
 
-        Pedido pedido;
-        if (proximoPedidoId != null) {
-            pedido = new Pedido(proximoPedidoId++, cliente);
-        } else {
-            pedido = new Pedido(null, cliente);
-        }
+		Pedido pedido;
+		if (proximoPedidoId != null) {
+			pedido = new Pedido(proximoPedidoId++, cliente);
+		} else {
+			pedido = new Pedido(null, cliente);
+		}
 
-        return pedidoRepository.save(pedido);
-    }
+		return pedidoRepository.save(pedido);
+	}
 
-    public List<Pedido> listarPedidosFinalizados() {
-        return pedidoRepository.findAll().stream()
-                .filter(p -> p.getStatus() == StatusPedido.FINALIZADO)
-                .collect(Collectors.toList());
-    }
+	public List<Pedido> listarPedidosFinalizados() {
+		return pedidoRepository.findAll().stream().filter(p -> p.getStatus() == StatusPedido.FINALIZADO)
+				.collect(Collectors.toList());
+	}
 
-    public void adicionarItem(Pedido pedido, Produto produto, int quantidade, double precoVenda) {
-        validarPedidoAberto(pedido);
-        EstoqueValidator.validarEstoqueSuficiente(produto, quantidade);
+	public void adicionarItem(Pedido pedido, Produto produto, int quantidade, double precoVenda) {
+	    validarPedidoAberto(pedido);
 
-        if (precoVenda <= 0)
-            throw new ValidationException("Preço de venda inválido.");
+	    
+	    Produto produtoAtualizado = produtoRepository.findById(produto.getId())
+	            .orElseThrow(() -> new ValidationException("Produto não encontrado no repositório."));
 
-        ItemPedido item;
-        if (proximoItemId != null) {
-            item = new ItemPedido(proximoItemId++, produto, quantidade, precoVenda);
-        } else {
-            item = new ItemPedido(null, produto, quantidade, precoVenda);
-        }
+	  
+	    EstoqueValidator.validarEstoqueSuficiente(produtoAtualizado, quantidade);
 
-        pedido.adicionarItem(item);
+	    if (precoVenda <= 0)
+	        throw new ValidationException("Preço de venda inválido.");
 
-        produto.setQuantidadeEstoque(produto.getQuantidadeEstoque() - quantidade);
-        produtoRepository.save(produto);
-        pedidoRepository.save(pedido);
+	   
+	    ItemPedido item;
+	    if (proximoItemId != null) {
+	        item = new ItemPedido(proximoItemId++, produtoAtualizado, quantidade, precoVenda);
+	    } else {
+	        item = new ItemPedido(null, produtoAtualizado, quantidade, precoVenda);
+	    }
 
-        EstoqueValidator.verificarEstoqueBaixo(produto, 5);
-    }
+	  
+	    pedido.adicionarItem(item);
 
-    public void removerItem(Pedido pedido, Long itemId) {
-        validarPedidoAberto(pedido);
+	    
+	    produtoAtualizado.setQuantidadeEstoque(produtoAtualizado.getQuantidadeEstoque() - quantidade);
+	    produtoRepository.save(produtoAtualizado);
 
-        ItemPedido item = pedido.getItens().stream()
-                .filter(i -> i.getId().equals(itemId))
-                .findFirst()
-                .orElseThrow(() -> new ValidationException("Item não encontrado no pedido."));
+	  
+	    pedidoRepository.save(pedido);
 
-        Produto produto = item.getProduto();
-        produto.setQuantidadeEstoque(produto.getQuantidadeEstoque() + item.getQuantidade());
-        produtoRepository.save(produto);
+	    
+	    EstoqueValidator.verificarEstoqueBaixo(produtoAtualizado, 5);
+	}
 
-        pedido.removerItem(itemId);
-        pedidoRepository.save(pedido);
-    }
+	public void removerItem(Pedido pedido, Long itemId) {
+		validarPedidoAberto(pedido);
 
-    public void alterarQuantidadeItem(Pedido pedido, Long itemId, int novaQuantidade) {
-        validarPedidoAberto(pedido);
+		ItemPedido item = pedido.getItens().stream().filter(i -> i.getId().equals(itemId)).findFirst()
+				.orElseThrow(() -> new ValidationException("Item não encontrado no pedido."));
 
-        ItemPedido item = pedido.getItens().stream()
-                .filter(i -> i.getId().equals(itemId))
-                .findFirst()
-                .orElseThrow(() -> new ValidationException("Item não encontrado no pedido."));
+		Produto produto = item.getProduto();
+		produto.setQuantidadeEstoque(produto.getQuantidadeEstoque() + item.getQuantidade());
+		produtoRepository.save(produto);
 
-        int delta = novaQuantidade - item.getQuantidade();
+		pedido.removerItem(itemId);
+		pedidoRepository.save(pedido);
+	}
 
-        if (delta > 0)
-            EstoqueValidator.validarEstoqueSuficiente(item.getProduto(), delta);
+	public void alterarQuantidadeItem(Pedido pedido, Long itemId, int novaQuantidade) {
+	    validarPedidoAberto(pedido);
 
-        item.getProduto().setQuantidadeEstoque(item.getProduto().getQuantidadeEstoque() - delta);
-        item.setQuantidade(novaQuantidade);
+	    ItemPedido item = pedido.getItens().stream()
+	            .filter(i -> i.getId().equals(itemId))
+	            .findFirst()
+	            .orElseThrow(() -> new ValidationException("Item não encontrado no pedido."));
 
-        produtoRepository.save(item.getProduto());
-        pedidoRepository.save(pedido);
+	    int delta = novaQuantidade - item.getQuantidade();
+	    Produto produto = item.getProduto();
 
-        EstoqueValidator.verificarEstoqueBaixo(item.getProduto(), 5);
-    }
+	    if (delta > 0) {
+	        EstoqueValidator.validarEstoqueSuficiente(produto, delta);
+	        produto.setQuantidadeEstoque(produto.getQuantidadeEstoque() - delta);
+	    } else if (delta < 0) {
+	        produto.setQuantidadeEstoque(produto.getQuantidadeEstoque() + Math.abs(delta));
+	    }
 
-    public void finalizarPedido(Pedido pedido) {
-        validarPedidoAberto(pedido);
-        if (!pedido.podeFinalizar()) {
-            throw new ValidationException("Não é possível finalizar pedido sem itens ou valor maior que zero.");
-        }
+	    item.setQuantidade(novaQuantidade);
+	    produtoRepository.save(produto);
+	    pedidoRepository.save(pedido);
 
-        pedido.finalizarPedido();
-        pedidoRepository.save(pedido);
-        notificador.notificarPedidoCriado(pedido.getCliente(), pedido);
-    }
+	    EstoqueValidator.verificarEstoqueBaixo(produto, 5);
+	}
 
-    public void pagarPedido(Pedido pedido) {
-        if (pedido.getStatus() != StatusPedido.AGUARDANDO_PAGAMENTO) {
-            throw new ValidationException("Pedido deve estar 'AGUARDANDO PAGAMENTO' antes de pagar.");
-        }
-        pedido.pagar();
-        pedidoRepository.save(pedido);
-        notificador.notificarPagamentoAprovado(pedido.getCliente(), pedido);
-    }
 
-    public void entregarPedido(Pedido pedido) {
-        if (pedido.getStatus() != StatusPedido.PAGO) {
-            throw new ValidationException("Pedido deve estar 'PAGO' antes de entregar.");
-        }
-        pedido.entregar();
-        pedidoRepository.save(pedido);
-        notificador.notificarPedidoEntregue(pedido.getCliente(), pedido);
-    }
+	public void finalizarPedido(Pedido pedido) {
+		validarPedidoAberto(pedido);
+		if (!pedido.podeFinalizar()) {
+			throw new ValidationException("Não é possível finalizar pedido sem itens ou valor maior que zero.");
+		}
 
-    private void validarPedidoAberto(Pedido pedido) {
-        if (pedido == null)
-            throw new ValidationException("Pedido não pode ser nulo.");
-        if (pedido.getStatus() != StatusPedido.ABERTO)
-            throw new ValidationException("Só é possível alterar pedidos com status 'ABERTO'.");
-    }
+		pedido.finalizarPedido();
+		pedidoRepository.save(pedido);
+		notificador.notificarPedidoCriado(pedido.getCliente(), pedido);
+	}
+
+	public void pagarPedido(Pedido pedido) {
+		if (pedido.getStatus() != StatusPedido.AGUARDANDO_PAGAMENTO) {
+			throw new ValidationException("Pedido deve estar 'AGUARDANDO PAGAMENTO' antes de pagar.");
+		}
+		pedido.pagar();
+		pedidoRepository.save(pedido);
+		notificador.notificarPagamentoAprovado(pedido.getCliente(), pedido);
+	}
+
+	public void entregarPedido(Pedido pedido) {
+		if (pedido.getStatus() != StatusPedido.PAGO) {
+			throw new ValidationException("Pedido deve estar 'PAGO' antes de entregar.");
+		}
+		pedido.entregar();
+		pedidoRepository.save(pedido);
+		notificador.notificarPedidoEntregue(pedido.getCliente(), pedido);
+	}
+
+	private void validarPedidoAberto(Pedido pedido) {
+		if (pedido == null)
+			throw new ValidationException("Pedido não pode ser nulo.");
+		if (pedido.getStatus() != StatusPedido.ABERTO)
+			throw new ValidationException("Só é possível alterar pedidos com status 'ABERTO'.");
+	}
 }

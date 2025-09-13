@@ -13,6 +13,8 @@ import br.com.adacommerce.ecommerce.notifications.Notificador;
 import br.com.adacommerce.ecommerce.service.ClienteService;
 import br.com.adacommerce.ecommerce.service.ProdutoService;
 import br.com.adacommerce.ecommerce.service.VendaService;
+import br.com.adacommerce.ecommerce.validators.DocumentoValidator;
+import br.com.adacommerce.ecommerce.validators.EmailValidator;
 
 public class ECommerceController {
 
@@ -50,7 +52,6 @@ public class ECommerceController {
                 case "8": entregarPedido(); break;
                 case "9": mostrarPedidosFinalizados(); break;
                 case "10": removerItemDoPedido(); break;
-            
                 case "0": rodando = false; System.out.println("Saindo do sistema..."); break;
                 default: System.out.println("Opção inválida!");
             }
@@ -69,7 +70,6 @@ public class ECommerceController {
         System.out.println("8 - Entregar Pedido");
         System.out.println("9 - Mostrar pedidos finalizados");
         System.out.println("10 - Remover item do Pedido");
-       
         System.out.println("0 - Sair");
         System.out.print("Escolha uma opção: ");
     }
@@ -89,6 +89,11 @@ public class ECommerceController {
                 System.out.print("Nome: "); String nome = scanner.nextLine();
                 System.out.print("Email: "); String email = scanner.nextLine();
                 System.out.print("Documento: "); String doc = scanner.nextLine();
+                
+                
+                DocumentoValidator.validar(doc);
+                EmailValidator.validar(email);
+                
                 clienteSelecionado = clienteService.cadastrarCliente(nome, email, doc);
                 System.out.println("Cliente cadastrado: " + clienteSelecionado.getNome());
             } catch (ValidationException ve) {
@@ -112,12 +117,8 @@ public class ECommerceController {
 
         System.out.print("Digite ID para atualizar ou 0 para cadastrar novo: ");
         long idProduto;
-        try { 
-            idProduto = Long.parseLong(scanner.nextLine()); 
-        } catch (NumberFormatException e) { 
-            System.out.println("ID inválido!"); 
-            return; 
-        }
+        try { idProduto = Long.parseLong(scanner.nextLine()); } 
+        catch (NumberFormatException e) { System.out.println("ID inválido!"); return; }
 
         if (idProduto == 0) {
             try {
@@ -187,17 +188,8 @@ public class ECommerceController {
             Produto produto = produtoService.buscarProdutoPorId(prodId)
                     .orElseThrow(() -> new ValidationException("Produto não encontrado"));
 
-            if (produto.getQuantidadeEstoque() < qtd) {
-                System.out.println("Estoque insuficiente! Disponível: " + produto.getQuantidadeEstoque());
-                return;
-            }
-
             vendaService.adicionarItem(pedidoAtual, produto, qtd, produto.getPreco());
             System.out.println("Item adicionado!");
-
-            if (produto.getQuantidadeEstoque() - qtd <= 5) { 
-                notificador.notificarEstoqueBaixo(produto.getNome(), produto.getQuantidadeEstoque() - qtd);
-            }
 
         } catch (ValidationException | NumberFormatException e) {
             System.out.println("Erro: " + e.getMessage());
@@ -208,20 +200,22 @@ public class ECommerceController {
         if (pedidoAtual == null) { System.out.println("Crie um pedido primeiro!"); return; }
         try {
             System.out.print("ID do item: "); Long itemId = Long.parseLong(scanner.nextLine());
-            System.out.print("Nova quantidade: "); int qtd = Integer.parseInt(scanner.nextLine());
-            vendaService.alterarQuantidadeItem(pedidoAtual, itemId, qtd);
+            System.out.print("Nova quantidade: "); int novaQtd = Integer.parseInt(scanner.nextLine());
+
+            vendaService.alterarQuantidadeItem(pedidoAtual, itemId, novaQtd);
             System.out.println("Quantidade atualizada!");
 
-           
-            pedidoAtual.getItens().stream()
-                .filter(i -> i.getId().equals(itemId))
-                .findFirst()
-                .ifPresent(i -> {
-                    if (i.getProduto().getQuantidadeEstoque() <= 5) {
-                        notificador.notificarEstoqueBaixo(i.getProduto().getNome(), i.getProduto().getQuantidadeEstoque());
-                    }
-                });
+        } catch (ValidationException | NumberFormatException e) {
+            System.out.println("Erro: " + e.getMessage());
+        }
+    }
 
+    private void removerItemDoPedido() {
+        if (pedidoAtual == null) { System.out.println("Crie um pedido primeiro!"); return; }
+        try {
+            System.out.print("ID do item: "); Long itemId = Long.parseLong(scanner.nextLine());
+            vendaService.removerItem(pedidoAtual, itemId);
+            System.out.println("Item removido!");
         } catch (ValidationException | NumberFormatException e) {
             System.out.println("Erro: " + e.getMessage());
         }
@@ -252,8 +246,6 @@ public class ECommerceController {
         }
     }
 
-
-
     private void entregarPedido() {
         if (pedidoAtual == null) { System.out.println("Crie um pedido primeiro!"); return; }
         try {
@@ -266,24 +258,11 @@ public class ECommerceController {
         }
     }
 
-    private void removerItemDoPedido() {
-        if (pedidoAtual == null) { System.out.println("Crie um pedido primeiro!"); return; }
-        try {
-            System.out.print("ID do item: "); Long itemId = Long.parseLong(scanner.nextLine());
-            vendaService.removerItem(pedidoAtual, itemId);
-            System.out.println("Item removido!");
-        } catch (ValidationException | NumberFormatException e) {
-            System.out.println("Erro: " + e.getMessage());
-        }
-    }
-
     private void mostrarPedidosFinalizados() {
         List<Pedido> pedidos = vendaService.listarPedidosFinalizados();
         if (pedidos.isEmpty()) System.out.println("Nenhum pedido finalizado!");
         else pedidos.forEach(this::mostrarResumoPedido);
     }
-
-   
 
     private void mostrarResumoPedido(Pedido pedido) {
         System.out.println("\n=== RESUMO PEDIDO ID " + pedido.getId() + " ===");

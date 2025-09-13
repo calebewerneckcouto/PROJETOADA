@@ -9,16 +9,16 @@ import br.com.adacommerce.ecommerce.repository.Repository;
 
 public class ClienteService {
     private final Repository<Cliente, Long> clienteRepository;
-    private Long proximoId; // só usado em memória
+    private Long proximoId; 
 
     public ClienteService(Repository<Cliente, Long> clienteRepository) {
         this.clienteRepository = clienteRepository;
 
-        // Só usa controle de ID manual se não for banco
+        
         try {
             this.proximoId = clienteRepository.getNextId();
         } catch (UnsupportedOperationException e) {
-            this.proximoId = null; // no banco não precisamos disso
+            this.proximoId = null; 
         }
     }
 
@@ -35,10 +35,10 @@ public class ClienteService {
 
         Cliente cliente;
         if (proximoId != null) { 
-            // Repositório em memória ou arquivo
+            
             cliente = new Cliente(proximoId++, nome, email, documento);
         } else { 
-            // Banco → Hibernate gera o ID
+            
             cliente = new Cliente(null, nome, email, documento);
         }
 
