@@ -13,6 +13,7 @@ import br.com.adacommerce.ecommerce.notifications.Notificador;
 import br.com.adacommerce.ecommerce.service.ClienteService;
 import br.com.adacommerce.ecommerce.service.GptService;
 import br.com.adacommerce.ecommerce.service.ProdutoService;
+import br.com.adacommerce.ecommerce.service.RelatorioPDFService;
 import br.com.adacommerce.ecommerce.service.VendaService;
 import br.com.adacommerce.ecommerce.validators.DocumentoValidator;
 import br.com.adacommerce.ecommerce.validators.EmailValidator;
@@ -24,6 +25,8 @@ public class ECommerceController {
 	private final VendaService vendaService;
 	private final Scanner scanner;
 	private final Notificador notificador;
+	private RelatorioPDFService relatorioPDFService;
+
 	private final String SENHA_GERENTE = System.getenv("GERENTE_SENHA");
 
 	private final GptService gptService;
@@ -39,6 +42,8 @@ public class ECommerceController {
 		this.scanner = scanner;
 		this.gptService = gptService;
 		this.notificador = new EmailNotificador();
+
+		this.relatorioPDFService = new RelatorioPDFService(clienteService, produtoService, vendaService);
 	}
 
 	public void iniciar() {
@@ -90,6 +95,12 @@ public class ECommerceController {
 			case "14":
 				relatorioGpt();
 				break;
+			case "15":
+				System.out.print("Digite a senha do gerente para gerar o relatório: ");
+				String senha = scanner.nextLine();
+				String resultado = relatorioPDFService.gerarRelatorio("relatorio-ada.pdf", senha);
+				System.out.println(resultado);
+				break;
 
 			case "0":
 				rodando = false;
@@ -118,6 +129,7 @@ public class ECommerceController {
 		System.out.println("12 - Buscar Cliente por Documento");
 		System.out.println("13 - Buscar Produto por Nome");
 		System.out.println("14 - Perguntar ao gerente ADA (ChatGPT) (Somente Diretoria)");
+		System.out.println("15 - Gerar Relatorio PDF Banco (Somente Diretoria)");
 
 		System.out.println("0 - Sair");
 		System.out.print("Escolha uma opção: ");
@@ -338,100 +350,103 @@ public class ECommerceController {
 		}
 	}
 
-	
-
-	// Método atualizado para o ECommerceController
-
-	// Método atualizado para o ECommerceController
-
-	// Método atualizado para o ECommerceController
-
 	private void relatorioGpt() {
-	    System.out.print("Digite a senha de acesso ao gerente ADA: ");
-	    String senha = scanner.nextLine();
+		System.out.print("Digite a senha de acesso ao gerente ADA: ");
+		String senha = scanner.nextLine();
 
-	    if (!SENHA_GERENTE.equals(senha)) {
-	        System.out.println("Senha incorreta! Acesso negado.");
-	        return;
-	    }
+		if (!SENHA_GERENTE.equals(senha)) {
+			System.out.println("Senha incorreta! Acesso negado.");
+			return;
+		}
 
-	    // Opção para debug completo
-	    System.out.print("Modo debug? (s para ver dados que serão enviados): ");
-	    String debug = scanner.nextLine().toLowerCase();
+		// Opção para debug completo
+		System.out.print("Modo debug? (s para ver dados que serão enviados): ");
+		String debug = scanner.nextLine().toLowerCase();
 
-	    System.out.println("=== GERENTE ADA - ASSISTENTE DE DADOS ===");
-	    System.out.println("Você pode perguntar sobre:");
-	    System.out.println("• Clientes cadastrados e seus dados");
-	    System.out.println("• Produtos, preços e estoque");
-	    System.out.println("• Pedidos, vendas e faturamento");
-	    System.out.println("• Relatórios e análises dos dados");
-	    System.out.println();
-	    
-	    System.out.print("Digite sua pergunta para o gerente ADA: ");
-	    String pergunta = scanner.nextLine();
+		System.out.println("=== GERENTE ADA - ASSISTENTE DE DADOS ===");
+		System.out.println("Você pode perguntar sobre:");
+		System.out.println("• Clientes cadastrados e seus dados");
+		System.out.println("• Produtos, preços e estoque");
+		System.out.println("• Pedidos, vendas e faturamento");
+		System.out.println("• Relatórios e análises dos dados");
+		System.out.println();
 
-	    if (pergunta.trim().isEmpty()) {
-	        System.out.println("Pergunta não pode estar vazia!");
-	        return;
-	    }
+		System.out.print("Digite sua pergunta para o gerente ADA: ");
+		String pergunta = scanner.nextLine();
 
-	    // Debug se solicitado
-	    if ("s".equals(debug)) {
-	        gptService.debugDados(pergunta);
-	        System.out.print("Continuar com o envio? (s/n): ");
-	        if (!"s".equals(scanner.nextLine().toLowerCase())) {
-	            return;
-	        }
-	    }
+		if (pergunta.trim().isEmpty()) {
+			System.out.println("Pergunta não pode estar vazia!");
+			return;
+		}
 
-	    System.out.println("\n🤖 Processando dados do banco e gerando resposta...");
-	    
-	    // Mostra estatísticas dos dados
-	    gptService.mostrarEstatisticasChunks();
-	    
-	    // Chama o método corrigido
-	    String resposta = gptService.gerarRelatorioGPT(pergunta, senha);
+		// Debug se solicitado
+		if ("s".equals(debug)) {
+			gptService.debugDados(pergunta);
+			System.out.print("Continuar com o envio? (s/n): ");
+			if (!"s".equals(scanner.nextLine().toLowerCase())) {
+				return;
+			}
+		}
 
-	    System.out.println("\n" + "=".repeat(50));
-	    System.out.println("GERENTE ADA RESPONDE:");
-	    System.out.println("=".repeat(50));
-	    System.out.println(resposta);
-	    System.out.println("=".repeat(50));
-	    
-	    // Opção de enviar por email
-	    System.out.print("\nDeseja enviar este relatório por email? (s/n): ");
-	    String enviarEmail = scanner.nextLine().toLowerCase();
-	    
-	    if ("s".equals(enviarEmail)) {
-	        System.out.print("Digite o email de destino: ");
-	        String emailDestino = scanner.nextLine().trim();
-	        
-	        if (!emailDestino.isEmpty() && emailDestino.contains("@")) {
-	            System.out.println("📧 Enviando relatório por email...");
-	            
-	            boolean emailEnviado = gptService.enviarRelatorioPorEmail(emailDestino, pergunta, resposta);
-	            
-	            if (emailEnviado) {
-	                System.out.println("✅ Relatório enviado com sucesso para: " + emailDestino);
-	            } else {
-	                System.out.println("❌ Erro ao enviar email. Verifique:");
-	                System.out.println("  - Configurações EMAIL_USER e EMAIL_PASSWORD");
-	                System.out.println("  - Conexão com internet");
-	                System.out.println("  - Email de destino válido");
-	            }
-	        } else {
-	            System.out.println("Email inválido! Deve conter @ e não estar vazio.");
-	        }
-	    }
-	    
-	    // Opção de fazer nova pergunta
-	    System.out.print("\nDeseja fazer outra pergunta? (s/n): ");
-	    String novaPergunta = scanner.nextLine().toLowerCase();
-	    
-	    if ("s".equals(novaPergunta)) {
-	        relatorioGpt(); // Recursão para nova pergunta
-	    }
+		System.out.println("\n🤖 Processando dados do banco e gerando resposta...");
+
+		// Mostra estatísticas dos dados
+		gptService.mostrarEstatisticasChunks();
+
+		// Chama o método corrigido
+		String resposta = gptService.gerarRelatorioGPT(pergunta, senha);
+
+		System.out.println("\n" + "=".repeat(50));
+		System.out.println("GERENTE ADA RESPONDE:");
+		System.out.println("=".repeat(50));
+		System.out.println(resposta);
+		System.out.println("=".repeat(50));
+		System.out.print("\nDeseja gerar um relatório PDF desta análise? (s/n): ");
+		String gerarPdf = scanner.nextLine().toLowerCase();
+
+		if ("s".equals(gerarPdf)) {
+			// Caminho fixo do PDF, sem perguntar ao usuário
+			 String caminhoPdf = "C:/Users/WINDOWS 11/eclipse-workspace/ADACommerce/relatoriogpt-ada.pdf";
+
+			gptService.gerarRelatorioPdfComPergunta(caminhoPdf, pergunta, resposta);
+			System.out.println("✅ PDF gerado com sucesso em: " + caminhoPdf);
+		}
+
+		// Opção de enviar por email
+		System.out.print("\nDeseja enviar este relatório por email? (s/n): ");
+		String enviarEmail = scanner.nextLine().toLowerCase();
+
+		if ("s".equals(enviarEmail)) {
+			System.out.print("Digite o email de destino: ");
+			String emailDestino = scanner.nextLine().trim();
+
+			if (!emailDestino.isEmpty() && emailDestino.contains("@")) {
+				System.out.println("📧 Enviando relatório por email...");
+
+				boolean emailEnviado = gptService.enviarRelatorioPorEmail(emailDestino, pergunta, resposta);
+
+				if (emailEnviado) {
+					System.out.println("✅ Relatório enviado com sucesso para: " + emailDestino);
+				} else {
+					System.out.println("❌ Erro ao enviar email. Verifique:");
+					System.out.println("  - Configurações EMAIL_USER e EMAIL_PASSWORD");
+					System.out.println("  - Conexão com internet");
+					System.out.println("  - Email de destino válido");
+				}
+			} else {
+				System.out.println("Email inválido! Deve conter @ e não estar vazio.");
+			}
+		}
+
+		// Opção de fazer nova pergunta
+		System.out.print("\nDeseja fazer outra pergunta? (s/n): ");
+		String novaPergunta = scanner.nextLine().toLowerCase();
+
+		if ("s".equals(novaPergunta)) {
+			relatorioGpt(); // Recursão para nova pergunta
+		}
 	}
+
 	private void removerItemDoPedido() {
 		if (pedidoAtual == null) {
 			System.out.println("Crie um pedido primeiro!");
