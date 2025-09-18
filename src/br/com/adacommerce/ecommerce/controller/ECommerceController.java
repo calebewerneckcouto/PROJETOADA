@@ -42,19 +42,24 @@ public class ECommerceController {
             mostrarMenu();
             String opcao = scanner.nextLine();
             switch (opcao) {
-                case "1": selecionarOuCadastrarCliente(); break;
-                case "2": cadastrarOuAtualizarProduto(); break;
-                case "3": criarPedido(); break;
-                case "4": adicionarProdutoAoPedido(); break;
-                case "5": atualizarQuantidadeItem(); break;
-                case "6": finalizarPedido(); break;
-                case "7": pagarPedido(); break;
-                case "8": entregarPedido(); break;
-                case "9": mostrarPedidosFinalizados(); break;
-                case "10": removerItemDoPedido(); break;
-                case "0": rodando = false; System.out.println("Saindo do sistema..."); break;
-                default: System.out.println("Opção inválida!");
-            }
+            case "1": selecionarOuCadastrarCliente(); break;
+            case "2": cadastrarOuAtualizarProduto(); break;
+            case "3": criarPedido(); break;
+            case "4": adicionarProdutoAoPedido(); break;
+            case "5": atualizarQuantidadeItem(); break;
+            case "6": finalizarPedido(); break;
+            case "7": pagarPedido(); break;
+            case "8": entregarPedido(); break;
+            case "9": mostrarPedidosFinalizados(); break;
+            case "10": removerItemDoPedido(); break;
+            case "11": atualizarCliente(); break; 
+            case "12": buscarClientePorDocumento(); break; 
+            case "13": buscarProdutoPorNome(); break; 
+
+            case "0": rodando = false; System.out.println("Saindo do sistema..."); break;
+            default: System.out.println("Opção inválida!");
+        }
+
         }
     }
 
@@ -70,9 +75,13 @@ public class ECommerceController {
         System.out.println("8 - Entregar Pedido");
         System.out.println("9 - Mostrar pedidos finalizados");
         System.out.println("10 - Remover item do Pedido");
+        System.out.println("11 - Atualizar Cliente");
+        System.out.println("12 - Buscar Cliente por Documento");
+        System.out.println("13 - Buscar Produto por Nome"); // ✅ Novo
         System.out.println("0 - Sair");
         System.out.print("Escolha uma opção: ");
     }
+
 
     private void selecionarOuCadastrarCliente() {
         List<Cliente> clientes = clienteService.listarClientes();
@@ -109,6 +118,73 @@ public class ECommerceController {
             }
         }
     }
+    
+    
+    
+ 
+    private void atualizarCliente() {
+        List<Cliente> clientes = clienteService.listarClientes();
+        if (clientes.isEmpty()) {
+            System.out.println("Nenhum cliente cadastrado!");
+            return;
+        }
+
+        clientes.forEach(c -> System.out.println(c.getId() + " - " + c.getNome() + " (" + c.getEmail() + ")"));
+
+        try {
+            System.out.print("Digite o ID do cliente para atualizar: ");
+            Long id = Long.parseLong(scanner.nextLine());
+
+            System.out.print("Novo nome (Enter para manter): ");
+            String nome = scanner.nextLine();
+
+            System.out.print("Novo email (Enter para manter): ");
+            String email = scanner.nextLine();
+
+            System.out.print("Novo documento (Enter para manter): ");
+            String documento = scanner.nextLine();
+
+            Cliente atualizado = clienteService.atualizarCliente(
+                    id,
+                    nome.isEmpty() ? null : nome,
+                    email.isEmpty() ? null : email,
+                    documento.isEmpty() ? null : documento
+            );
+
+            System.out.println("Cliente atualizado: " + atualizado.getNome());
+
+        } catch (ValidationException | NumberFormatException e) {
+            System.out.println("Erro: " + e.getMessage());
+        }
+    }
+
+   
+    private void buscarClientePorDocumento() {
+        System.out.print("Digite o documento do cliente: ");
+        String documento = scanner.nextLine();
+
+        clienteService.buscarPorDocumento(documento)
+                .ifPresentOrElse(
+                        c -> System.out.println("Encontrado: " + c.getNome() + " - " + c.getEmail()),
+                        () -> System.out.println("Nenhum cliente encontrado com este documento.")
+                );
+    }
+
+    
+ 
+    private void buscarProdutoPorNome() {
+        System.out.print("Digite o nome do produto: ");
+        String nome = scanner.nextLine();
+
+        produtoService.buscarProdutoPorNome(nome)
+                .ifPresentOrElse(
+                    p -> System.out.println("Encontrado: " + p.getNome() +
+                            " - Preço: " + p.getPreco() +
+                            " - Estoque: " + p.getQuantidadeEstoque()),
+                    () -> System.out.println("Nenhum produto encontrado com este nome.")
+                );
+    }
+
 
     private void cadastrarOuAtualizarProduto() {
         List<Produto> produtos = produtoService.listarProdutos();

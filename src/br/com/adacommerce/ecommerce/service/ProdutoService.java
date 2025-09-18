@@ -5,16 +5,14 @@ import java.util.Optional;
 
 import br.com.adacommerce.ecommerce.exceptions.ValidationException;
 import br.com.adacommerce.ecommerce.model.Produto;
+import br.com.adacommerce.ecommerce.notifications.EstoqueValidator;
 import br.com.adacommerce.ecommerce.notifications.Notificador;
 import br.com.adacommerce.ecommerce.repository.Repository;
-import br.com.adacommerce.ecommerce.validators.EstoqueValidator;
 
 public class ProdutoService {
     private final Repository<Produto, Long> produtoRepository;
     private final Notificador notificador;
     private final int limiteAlertaEstoque = 5;
-
-   
     private Long proximoId;
 
     public ProdutoService(Repository<Produto, Long> produtoRepository, Notificador notificador) {
@@ -28,6 +26,7 @@ public class ProdutoService {
         }
     }
 
+    
     public Produto cadastrarProduto(String nome, String descricao, double preco, int quantidadeEstoque) {
         if (nome == null || nome.trim().isEmpty())
             throw new ValidationException("Nome é obrigatório");
@@ -48,6 +47,7 @@ public class ProdutoService {
         return salvo;
     }
 
+    
     public Produto atualizarProduto(Long id, String nome, String descricao, double preco, Integer quantidadeEstoque) {
         Produto produto = produtoRepository.findById(id)
                 .orElseThrow(() -> new ValidationException("Produto não encontrado com ID: " + id));
@@ -66,11 +66,28 @@ public class ProdutoService {
         return produtoRepository.save(produto);
     }
 
+    
     public List<Produto> listarProdutos() {
         return produtoRepository.findAll();
     }
 
+    
     public Optional<Produto> buscarProdutoPorId(Long id) {
         return produtoRepository.findById(id);
+    }
+
+   
+    public Optional<Produto> buscarProdutoPorNome(String nome) {
+        String nomeNormalizado = nome.trim().toLowerCase();
+        return produtoRepository.findAll().stream()
+                .filter(p -> p.getNome() != null &&
+                             p.getNome().trim().toLowerCase().equals(nomeNormalizado))
+                .findFirst();
+    }
+
+
+    
+    public void excluirProduto(Long id) {
+        throw new UnsupportedOperationException("Exclusão de produto não é permitida (histórico mantido).");
     }
 }
