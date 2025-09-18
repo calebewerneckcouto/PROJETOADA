@@ -20,7 +20,7 @@ public class ECommerceSystem {
         Scanner scanner = new Scanner(System.in);
 
         
-        Persistencia tipo = Persistencia.BANCO;
+        Persistencia tipo = Persistencia.ARQUIVO;
         RepositoryFactory factory = new RepositoryFactory(tipo);
 
       
