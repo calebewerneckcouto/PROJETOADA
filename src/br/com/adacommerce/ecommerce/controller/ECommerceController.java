@@ -298,15 +298,19 @@ public class ECommerceController {
     }
 
     private void finalizarPedido() {
-        if (pedidoAtual == null) { System.out.println("Crie um pedido primeiro!"); return; }
+        if (pedidoAtual == null) {
+            System.out.println("Crie um pedido primeiro!");
+            return;
+        }
         try {
-            vendaService.finalizarPedido(pedidoAtual);
+            vendaService.finalizarPedido(pedidoAtual); 
             System.out.println("Pedido finalizado com sucesso!");
             mostrarResumoPedido(pedidoAtual);
         } catch (ValidationException ve) {
             System.out.println("Não foi possível finalizar o pedido: " + ve.getMessage());
         }
     }
+
 
     private void pagarPedido() {
         if (pedidoAtual == null) { 
@@ -328,7 +332,7 @@ public class ECommerceController {
             vendaService.entregarPedido(pedidoAtual);
             System.out.println("Pedido entregue com sucesso!");
             mostrarResumoPedido(pedidoAtual);
-            notificador.notificarPedidoEntregue(clienteSelecionado, pedidoAtual);
+           
         } catch (ValidationException ve) {
             System.out.println("Não foi possível entregar o pedido: " + ve.getMessage());
         }
