@@ -155,7 +155,7 @@ public class ECommerceController {
 				String nome = scanner.nextLine();
 				System.out.print("Email: ");
 				String email = scanner.nextLine();
-				System.out.print("Documento: ");
+				System.out.print("Documento: (CPF ou CNPJ) ");
 				String doc = scanner.nextLine();
 
 				DocumentoValidator.validar(doc);
