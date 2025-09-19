@@ -49,6 +49,6 @@ public class PedidoRepositoryDB implements Repository<Pedido, Long> {
 
     @Override
     public Long getNextId() {
-        return null; // Auto-increment no banco
+        return null; 
     }
 }

@@ -49,7 +49,7 @@ public class ClienteRepositoryDB implements Repository<Cliente, Long> {
 
     @Override
     public Long getNextId() {
-        // No banco, normalmente usamos auto_increment, então pode retornar null
+       
         return null;
     }
 }

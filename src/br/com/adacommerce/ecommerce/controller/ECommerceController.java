@@ -359,7 +359,7 @@ public class ECommerceController {
 			return;
 		}
 
-		// Opção para debug completo
+		
 		System.out.print("Modo debug? (s para ver dados que serão enviados): ");
 		String debug = scanner.nextLine().toLowerCase();
 
@@ -379,7 +379,7 @@ public class ECommerceController {
 			return;
 		}
 
-		// Debug se solicitado
+		
 		if ("s".equals(debug)) {
 			gptService.debugDados(pergunta);
 			System.out.print("Continuar com o envio? (s/n): ");
@@ -390,10 +390,10 @@ public class ECommerceController {
 
 		System.out.println("\n🤖 Processando dados do banco e gerando resposta...");
 
-		// Mostra estatísticas dos dados
+	
 		gptService.mostrarEstatisticasChunks();
 
-		// Chama o método corrigido
+		
 		String resposta = gptService.gerarRelatorioGPT(pergunta, senha);
 
 		System.out.println("\n" + "=".repeat(50));
@@ -405,14 +405,14 @@ public class ECommerceController {
 		String gerarPdf = scanner.nextLine().toLowerCase();
 
 		if ("s".equals(gerarPdf)) {
-			// Caminho fixo do PDF, sem perguntar ao usuário
+			
 			 String caminhoPdf = "C:/Users/WINDOWS 11/eclipse-workspace/ADACommerce/relatoriogpt-ada.pdf";
 
 			gptService.gerarRelatorioPdfComPergunta(caminhoPdf, pergunta, resposta);
 			System.out.println("✅ PDF gerado com sucesso em: " + caminhoPdf);
 		}
 
-		// Opção de enviar por email
+		
 		System.out.print("\nDeseja enviar este relatório por email? (s/n): ");
 		String enviarEmail = scanner.nextLine().toLowerCase();
 
@@ -438,12 +438,12 @@ public class ECommerceController {
 			}
 		}
 
-		// Opção de fazer nova pergunta
+		
 		System.out.print("\nDeseja fazer outra pergunta? (s/n): ");
 		String novaPergunta = scanner.nextLine().toLowerCase();
 
 		if ("s".equals(novaPergunta)) {
-			relatorioGpt(); // Recursão para nova pergunta
+			relatorioGpt(); 
 		}
 	}
 

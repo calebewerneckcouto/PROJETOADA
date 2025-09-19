@@ -29,7 +29,7 @@ public class EmailNotificador implements Notificador {
         }
     }
 
-    // ------- GERA TABELA DE PRODUTOS -------
+   
     private String gerarTabelaProdutos(Pedido pedido) {
         StringBuilder produtosHtml = new StringBuilder("<table style='width:100%; border-collapse: collapse; margin-top:15px;'>");
         produtosHtml.append("<tr style='background:#f4f4f4; text-align:left;'>")
@@ -51,7 +51,7 @@ public class EmailNotificador implements Notificador {
         return produtosHtml.toString();
     }
 
-    // ------- TEMPLATE BASE -------
+   
     private String gerarTemplateBase(String titulo, String corpo) {
         return """
                 <html>
@@ -70,7 +70,7 @@ public class EmailNotificador implements Notificador {
                 .formatted(titulo, corpo);
     }
 
-    // ------- PEDIDO CRIADO -------
+    
     @Override
     public void notificarPedidoCriado(Cliente cliente, Pedido pedido) {
         String corpo = """
@@ -102,7 +102,7 @@ public class EmailNotificador implements Notificador {
         notificarClienteHtml(cliente, "Pedido Criado", html);
     }
 
-    // ------- PAGAMENTO APROVADO -------
+   
     @Override
     public void notificarPagamentoAprovado(Cliente cliente, Pedido pedido) {
         String corpo = """
@@ -128,7 +128,7 @@ public class EmailNotificador implements Notificador {
         notificarClienteHtml(cliente, "Pagamento Aprovado", html);
     }
 
-    // ------- PEDIDO ENTREGUE -------
+   
     @Override
     public void notificarPedidoEntregue(Cliente cliente, Pedido pedido) {
         String corpo = """
@@ -154,7 +154,7 @@ public class EmailNotificador implements Notificador {
         notificarClienteHtml(cliente, "Pedido Entregue", html);
     }
 
-    // ------- ESTOQUE BAIXO -------
+   
     @Override
     public void notificarEstoqueBaixo(String produtoNome, int quantidade) {
         String corpo = """
@@ -180,7 +180,7 @@ public class EmailNotificador implements Notificador {
         }
     }
 
-    // ------- AGUARDANDO PAGAMENTO -------
+    
     @Override
     public void notificarPedidoAguardandoPagamento(Cliente cliente, Pedido pedido) {
         String corpo = """
