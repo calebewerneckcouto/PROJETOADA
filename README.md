@@ -1,67 +1,88 @@
-# Documentação do Sistema ECommerce AdaCommerce
+# ADA Commerce System README
 
-Este documento serve para explicar a estrutura e o funcionamento do sistema `AdaCommerce`, um sistema de e-commerce simples que permite o gerenciamento de clientes, produtos e pedidos com notificações por e-mail e suporte a diferentes métodos de persistência de dados.
+This is an e-commerce system designed for managing products, customers, and orders within an ADA Commerce platform. It consists of various services and components designed to handle the complex tasks associated with a modern e-commerce business, such as inventory management, orders, reporting, and customer management.
 
-## Estrutura de Diretórios e Principais Componentes
+## Project Structure and Folders
 
-O sistema é dividido nos seguintes pacotes:
+- `src/`
+  - `br.com.adacommerce.ecommerce/`
+    - `controller/` - Contains the `ECommerceController` responsible for managing user interactions.
+    - `exceptions/` - Custom exception classes like `BusinessException`, `ValidationException`, etc.
+    - `model/` - Domain models/entities such as `Cliente`, `Pedido`, `Produto`.
+    - `repository/` - Data access layers, repository interfaces and implementations.
+    - `service/` - Business logic handlers like `ClienteService`, `VendaService`, `ProdutoService`.
+    - `utils/` - Helper classes such as `DocumentoValidator`, `EmailValidator`.
+    - `validators/` - Validators like `EstoqueValidator`.
+- `resources/` - Configuration files and resources that are used within the application.
+- `docs/` - Additional documentation including setup guidelines and API description.
+- `tests/` - Test files for unit and integration tests.
 
-- `br.com.adacommerce.ecommerce.configure`: Contém a enumeração `Persistencia` que define os tipos de persistência disponíveis.
-- `br.com.adacommerce.ecommerce.controller`: Contém o controlador `ECommerceController` que gerencia toda a interação com o usuário através do console.
-- `br.com.adacommerce.ecommerce.exceptions`: Contém as exceções customizadas utilizadas no sistema.
-- `br.com.adacommerce.ecommerce.main`: Contém a classe principal `ECommerceSystem` que inicializa e executa o sistema.
-- `br.com.adacommerce.ecommerce.model`: Contém as entidades do sistema.
-- `br.com.adacommerce.ecommerce.notifications`: Contém as definições e implementações das notificações enviadas por e-mail.
-- `br.com.adacommerce.ecommerce.repository`: Contém as interfaces e implementações dos repositórios de dados.
-- `br.com.adacommerce.ecommerce.service`: Contém serviços que encapsulam a lógica de negócios.
-- `br.com.adacommerce.ecommerce.validators`: Contém validadores para dados de entrada como e-mail e documento.
+## Programming Languages Used
 
-### Principais Classes e Enumerações
+- **Java** - The primary programming language used for building the application.
 
-#### Modelos
+## Dependencies and Installation Guide
 
-- `Cliente`: Representa um cliente no sistema.
-- `Produto`: Representa um produto disponível para venda.
-- `Pedido`: Representa um pedido feito por um cliente.
-- `ItemPedido`: Representa um item dentro de um pedido.
-- `StatusPedido`: Enum que representa os possíveis estados de um pedido.
+### Required Tools:
 
-#### Repositórios
+- Java Development Kit (JDK) - Version 11 or higher.
+- Apache Maven - Dependency management and build tool.
 
-- `Repository<T, ID>`: Interface genérica para repositórios.
-- Classes como `ClienteRepositoryDB`, `ProdutoRepositoryDB`, etc., que implementam esta interface para diferentes entidades e métodos de persistência (memória, arquivo, banco de dados).
+### Libraries:
 
-#### Serviços
+- **Spring Framework** - For Dependency Injection.
+- **Hibernate ORM & JPA** - For database operations.
+- **iText** for PDF generation.
+- **JavaMail API** for email handling.
 
-- `ClienteService`: Serviço para operações relacionadas a clientes.
-- `ProdutoService`: Serviço para operações relacionadas a produtos.
-- `VendaService`: Serviço para operações relacionadas a pedidos.
+### Steps to Setup:
 
-#### Controlador
+1. **Clone the repository:**
+   ```sh
+   git clone https://github.com/yourusername/ada-commerce-system.git
+   cd ada-commerce-system
+   ```
+2. **Build the project:**
+   ```sh
+   mvn clean install
+   ```
+3. **Run the application:**
+   ```sh
+   java -jar target/ecommerce-1.0-SNAPSHOT.jar
+   ```
 
-- `ECommerceController`: Controlador que interage com o usuário para executar operações no sistema.
+## How to Run the Project and Execute Tests
 
-#### Notificações
+- **Running the project:** Follow the installation steps above to build and run the project.
+- **Executing tests:**
+  ```sh
+  mvn test
+  ```
 
-- `Notificador`: Interface para serviços de notificação.
-- `EmailNotificador`: Implementação de `Notificador` que envia e-mails.
+## Key Code Files Explanation
 
-#### Validações
+- `ECommerceController.java`: The main controller class orchestrating user interaction handling, integrating services like `ClienteService`, `ProdutoService`, and managing user input and output through console.
+- `ClienteService.java`, `VendaService.java`, `ProdutoService.java`: Services doing the heavy lifting for business logic specific to Clients, Sales, and Products respectively.
+- `Repository` interfaces in `br.com.adacommerce.ecommerce.repository` manage data persistence.
 
-- `EmailValidator`, `DocumentoValidator`, `EstoqueValidator`: Classes que proporcionam métodos estáticos para validar e-mails, documentos e estoques.
+## Usage Examples
 
-### Fluxo da Aplicação
+To operate the e-commerce system, start the application and use the console interface provided by `ECommerceController` to interact with the system such as creating orders, adding products, and managing customers.
 
-1. **Inicialização**: A classe `ECommerceSystem` inicializa o sistema configurando o tipo de persistência e criando os repositórios, serviços e controlador necessários.
-2. **Execução Interativa**: `ECommerceController` apresenta um menu interativo onde o usuário pode escolher realizar diferentes operações como cadastro de cliente, produtos, criação de pedidos, adição de itens, entre outros.
-3. **Processamento**: Cada ação no menu executa uma série de operações que podem envolver leitura de dados, validações, alterações no estado dos objetos, e interação com o usuário através do console.
-4. **Persistência de Dados**: Dependendo da configuração inicial, o sistema pode persistir dados em memória, arquivos ou banco de dados.
-5. **Notificações**: Em determinadas ações, o sistema envia notificações por e-mail ao cliente.
+## Best Practices and Contribution
 
-### Execução e Uso
+**Code Standards:**
+- Follow Java naming conventions.
+- Use clear and understandable variable names.
+- Comment your code where necessary.
 
-- O sistema é iniciado executando o arquivo `ECommerceSystem.java`.
-- O usuário interage com o sistema via console, seguindo as instruções e escolhendo opções do menu.
-- Para interagir adequadamente com o sistema, o usuário deve seguir as validações e formatos esperados para cada tipo de entrada (ex.: e-mails válidos, CPF/CNPJ válidos).
+**Contribution Guide:**
 
-Este sistema oferece uma visão simplificada mas extensível de um sistema de e-commerce, com potencial para expansão e integração com outras ferramentas e interfaces.
+1. **Fork the repository** and create your branch from `main`.
+2. **Make your changes** and test.
+3. **Write clear commit messages** describing your changes.
+4. **Open a pull request** with the changes.
+
+## Conclusion
+
+The ADA Commerce system is structured to be robust, providing a comprehensive suite of functionalities for an e-commerce platform. Its modular architecture ensures that adding new features or modifying existing ones is as streamlined as possible.
