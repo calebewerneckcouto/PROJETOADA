@@ -103,7 +103,7 @@ public class GptService {
     private List<String> gerarChunksDoBanco() {
         List<String> chunks = new ArrayList<>();
 
-        // Clientes
+        
         StringBuilder clientesChunk = new StringBuilder("=== CLIENTES ===\n");
         for (Cliente c : clienteService.listarClientes()) {
             clientesChunk.append(String.format("ID: %d | Nome: %s | Email: %s | Documento: %s\n",
@@ -111,7 +111,7 @@ public class GptService {
         }
         chunks.add(clientesChunk.toString());
 
-        // Produtos
+       
         StringBuilder produtosChunk = new StringBuilder("=== PRODUTOS ===\n");
         for (Produto p : produtoService.listarProdutos()) {
             produtosChunk.append(String.format("ID: %d | Nome: %s | Descrição: %s | Preço: %.2f | Estoque: %d\n",
@@ -119,7 +119,7 @@ public class GptService {
         }
         chunks.add(produtosChunk.toString());
 
-        // Pedidos
+        
         StringBuilder pedidosChunk = new StringBuilder("=== PEDIDOS ===\n");
         for (Pedido ped : vendaService.listarPedidosFinalizados()) {
             pedidosChunk.append(String.format(
@@ -161,7 +161,7 @@ public class GptService {
 
         for (int i = 0; i < chunks.size(); i++) {
             System.out.printf("Chunk %d: %d caracteres\n", i + 1, chunks.get(i).length());
-            // Preview das primeiras linhas
+           
             String[] linhas = chunks.get(i).split("\n");
             System.out.println("Preview:");
             for (int j = 0; j < Math.min(3, linhas.length); j++) {
@@ -259,7 +259,7 @@ public class GptService {
             PdfWriter.getInstance(document, new FileOutputStream(caminhoArquivo));
             document.open();
 
-            // ======== CABEÇALHO ========
+           
             Font tituloFont = new Font(Font.FontFamily.HELVETICA, 20, Font.BOLD, BaseColor.WHITE);
             PdfPTable headerTable = new PdfPTable(1);
             PdfPCell cell = new PdfPCell(new Phrase("📊 Relatório do Gerente ADA", tituloFont));
@@ -273,7 +273,7 @@ public class GptService {
 
             document.add(new Paragraph("\n"));
 
-            // ======== DATA ========
+            
             String dataHora = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date());
             Font dataFont = new Font(Font.FontFamily.HELVETICA, 10, Font.ITALIC, BaseColor.GRAY);
             Paragraph dataParagrafo = new Paragraph("Gerado em: " + dataHora, dataFont);
@@ -282,7 +282,7 @@ public class GptService {
 
             document.add(new Paragraph("\n"));
 
-            // ======== PERGUNTA ========
+            
             Font perguntaTituloFont = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD, new BaseColor(0, 123, 255));
             Paragraph perguntaParagrafo = new Paragraph("Pergunta solicitada:", perguntaTituloFont);
             document.add(perguntaParagrafo);
@@ -293,7 +293,7 @@ public class GptService {
             perguntaConteudo.setSpacingAfter(15);
             document.add(perguntaConteudo);
 
-            // ======== RESPOSTA ========
+          
             Font respostaTituloFont = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD, new BaseColor(30, 70, 32));
             Paragraph respostaTitulo = new Paragraph("Resposta do Gerente ADA:", respostaTituloFont);
             document.add(respostaTitulo);
@@ -304,7 +304,7 @@ public class GptService {
             respostaConteudo.setSpacingAfter(20);
             document.add(respostaConteudo);
 
-            // ======== RODAPÉ ========
+           
             Font rodapeFont = new Font(Font.FontFamily.HELVETICA, 9, Font.ITALIC, BaseColor.GRAY);
             Paragraph rodape = new Paragraph("ADA Commerce - Gestão Inteligente de Dados", rodapeFont);
             rodape.setAlignment(Element.ALIGN_CENTER);
