@@ -1,108 +1,149 @@
-```markdown
-# ADA Commerce E-Commerce System
+# README.md for the E-Commerce System
 
-## Descrição
+This repository contains the implementation of an e-commerce system developed in Java, designed to manage customer interactions, product listings, orders, and reports efficiently. Below is a comprehensive overview of the project's structure, coding languages, dependencies, installation, how to run the project, detailed explanations of the code files, usage examples, and contribution guidelines.
 
-Este repositório contém a implementação de um sistema de e-commerce chamado ADA Commerce, que utiliza uma arquitetura baseada em Java para gerenciar clientes, produtos, pedidos e outros aspectos do negócio on-line. O sistema disponibiliza funcionalidades como cadastro e busca de clientes, gerenciamento de produtos, realização e acompanhamento de pedidos, além de outros recursos úteis para uma operação de comércio eletrônico.
+## Project Structure and Directories
 
-## Estrutura do Projeto
-
-- `src/`
-  - `br.com.adacommerce.ecommerce/`
-    - `configure/` - Configurações gerais do sistema.
-    - `controller/` - Contém os controladores do sistema.
-    - `exceptions/` - Classes de exceção customizadas.
-    - `model/` - Entidades do modelo de domínio.
-    - `notifications/` - Envio de notificações (e-mail, etc.).
-    - `repository/` - Repositórios para gestão de dados.
-    - `service/` - Lógicas de negócio.
-    - `validators/` - Validadores para entrada de dados.
-    - `view/` - Interfaces e interações com o usuário.
-- `README.md`
-
-## Linguagens e Tecnologias Utilizadas
-
-- **Java**: Linguagem de programação principal para desenvolvimento do back-end.
-- **JPA (Java Persistence API)**: API de persistência para gerenciamento de dados.
-- **iText**: Biblioteca utilizada para a geração de relatórios em PDF.
-
-## Dependências e Instruções de Instalação
-
-1. **Java Development Kit (JDK)** - É necessário ter o JDK instalado na máquina. Recomendamos o uso da versão 17 ou superior para compatibilidade.
-2. **Gerenciador de Dependências** - Utilização do Maven ou Gradle para gerenciar as dependências do projeto.
-
-### Como instalar:
-
-Clone o repositório do projeto:
-
-```bash
-git clone https://github.com/seu_usuario/ada_commerce.git
-cd ada_commerce
+```
+ecommerce-system/
+│
+├── src/
+│   ├── br.com.adacommerce.ecommerce/
+│   │   ├── configure/
+│   │   │   └── Persistencia.java
+│   │   ├── controller/
+│   │   │   └── ECommerceController.java
+│   │   ├── exceptions/
+│   │   │   ├── BusinessException.java
+│   │   │   ├── InsufficientStockException.java
+│   │   │   └── ValidationException.java
+│   │   ├── model/
+│   │   │   ├── Cliente.java
+│   │   │   ├── ItemPedido.java
+│   │   │   ├── Pedido.java
+│   │   │   ├── Produto.java
+│   │   │   └── StatusPedido.java
+│   │   ├── notifications/
+│   │   │   ├── EmailNotificador.java
+│   │   │   └── Notificador.java
+│   │   ├── repository/
+│   │   │   ├── ClienteRepositoryDB.java
+│   │   │   ├── ProdutoRepositoryDB.java
+│   │   │   ├── Repository.java
+│   │   │   └── RepositoryFactory.java
+│   │   ├── service/
+│   │   │   ├── ClienteService.java
+│   │   │   ├── EmailService.java
+│   │   │   ├── ProdutoService.java
+│   │   │   ├── VendaService.java
+│   │   │   └── RelatorioPDFService.java
+│   │   └── validators/
+│   │       ├── DocumentoValidator.java
+│   │       ├── EmailValidator.java
+│   │       └── EstoqueValidator.java
+│   ├── META-INF/
+│   │   └── persistence.xml
+│   └── resources/
+│       └── logging.properties
+│
+├── .gitignore
+├── build.xml
+└── README.md
 ```
 
-Instale as dependências:
+## Programming Languages Used
 
-Usando Maven:
+- **Java**: Used for all backend logic, interactions, database communications, and validation mechanisms.
+
+## Dependencies and Installation
+
+### Dependencies
+
+- **Java SDK**: Version 17 or higher.
+- **Apache Ant**: To manage builds and dependencies.
+- **JPA (Java Persistence API)**: For ORM-based database management.
+- **Apache PDFBox**: For generating PDF reports.
+- **JUnit**: For testing purposes.
+
+### Installation
+
+1. **Clone the repository:**
+
+    ```bash
+    git clone https://github.com/yourusername/ecommerce-system.git
+    cd ecommerce-system
+    ```
+
+2. **Build the project:**
+
+    ```bash
+    ant build
+    ```
+
+3. **Setup Database (Optional):** Configure `src/META-INF/persistence.xml` to connect to your database.
+
+4. **Run migrations (Optional):** Setup initial database schemas if connected to a DB.
+
+## How to Run the Project and Execute Tests
+
+To run the project, execute:
+
 ```bash
-mvn install
+java -jar build/jar/ECommerceSystem.jar
 ```
 
-Usando Gradle:
+To execute tests:
+
 ```bash
-gradle build
+ant test
 ```
 
-## Executando o Projeto
+## Code File Explanations
 
-Para executar o sistema, use o seguinte comando pelo Maven ou Gradle:
+**ECommerceController.java:**
+- Manages user interactions and ties together services like `ClienteService`, `ProdutoService`, `VendaService`, and `RelatorioPDFService`.
 
-Usando Maven:
-```bash
-mvn exec:java -Dexec.mainClass="br.com.adacommerce.ecommerce.ECommerceSystem"
-```
+**Persistencia.java:**
+- Enum used to determine the type of data persistence (in-memory, file-based, database).
 
-Usando Gradle:
-```bash
-gradle run
-```
+**Validation Classes (EmailValidator, DocumentoValidator, EstoqueValidator):**
+- Perform validations on emails, documents (CPF/CNPJ), and stock levels.
 
-## Executando Testes
+**Service Classes (ClienteService, ProdutoService, VendaService):**
+- Handle business logic related to customers, products, and orders.
 
-Usando Maven:
-```bash
-mvn test
-```
+**Repository Classes (ClienteRepositoryDB, ProdutoRepositoryDB):**
+- Interface with the database to perform CRUD operations.
 
-Usando Gradle:
-```bash
-gradle test
-```
+**RelatorioPDFService.java:**
+- Generates detailed PDF reports for completed orders.
 
-## Principais Classes e Funções
+## Examples of Use
 
-### `ECommerceController`
+1. **Adding a New Customer:**
 
-- **Responsável pelo gerenciamento das operações do sistema**: Inclui funções para cadastro de clientes e produtos, criação de pedidos, adição de produtos a pedidos, finalização e pagamento de pedidos.
+    ```java
+    ClienteService clienteService = new ClienteService();
+    Cliente newClient = clienteService.cadastrarCliente("John Doe", "john.doe@example.com", "123.456.789-09");
+    ```
 
-### `Persistencia`
+2. **Creating an Order:**
 
-- **Enum que define os métodos de persistência utilizados**: Opções incluem memória, arquivo e banco de dados.
+    ```java
+    Pedido order = vendaService.criarPedido(newClient);
+    ```
 
-### `ClienteService`, `ProdutoService`, `VendaService`
+3. **Generating a Report:**
 
-- **Classes de Serviço**: Contêm a lógica de negócios principal para operações no sistema.
+    ```java
+    relatorioPDFService.gerarRelatorio("/path/to/report.pdf", "manager_password");
+    ```
 
-## Contribuindo
+## Best Practices and Contribution Guidelines
 
-Contribuições são sempre bem-vindas! Aqui estão algumas diretrizes que você deve seguir:
+- **Code Style:** Follow Java coding conventions.
+- **Testing:** Write JUnit tests for new features and bug fixes.
+- **Documentation:** Update comments and documentation in the README for major changes.
+- **Pull Requests:** Use clear, descriptive messages for commits and pull requests.
 
-1. **Use Fork e Pull Requests para contribuir**.
-2. **Siga as convenções de codificação** padrão para Java.
-3. **Escreva testes para novas funcionalidades e correções**.
-4. **Documente todas as mudanças significativas**.
-
-Para mais detalhes, consulte o arquivo `CONTRIBUTING.md`.
-
-## Licença
-
-Este projeto está licenciado sob a Licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
+Contribute by creating a pull request or opening issues for bugs or feature suggestions on GitHub. Detailed contributions guidelines can be found in the `CONTRIBUTING.md` file (to be created).
