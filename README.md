@@ -1,89 +1,108 @@
-# README.md for AdaCommerce E-Commerce Project
+```markdown
+# ADA Commerce E-Commerce System
 
-## Table of Contents
-1. [Project Structure and Folders](#project-structure-and-folders)
-2. [Programming Languages Used](#programming-languages-used)
-3. [Dependencies and Installation Instructions](#dependencies-and-installation-instructions)
-4. [Running the Project and Executing Tests](#running-the-project-and-executing-tests)
-5. [Code File Explanations](#code-file-explanations)
-6. [Usage Examples](#usage-examples)
-7. [Best Practices and Contribution Guidelines](#best-practices-and-contribution-guidelines)
+## Descrição
 
-## Project Structure and Folders
-The project follows a standard Maven project structure:
-- `src/main/java`: Contains all Java source code.
-  - `br.com.adacommerce.ecommerce`: Base package.
-    - `config`: Configuration settings and enums.
-    - `controller`: Controllers to handle user requests.
-    - `exceptions`: Custom exceptions.
-    - `model`: Domain models.
-    - `repository`: Interfaces for data access logic.
-    - `service`: Business logic and service layer.
-    - `validators`: Input validation logic.
-- `src/test/java`: Contains all test code.
+Este repositório contém a implementação de um sistema de e-commerce chamado ADA Commerce, que utiliza uma arquitetura baseada em Java para gerenciar clientes, produtos, pedidos e outros aspectos do negócio on-line. O sistema disponibiliza funcionalidades como cadastro e busca de clientes, gerenciamento de produtos, realização e acompanhamento de pedidos, além de outros recursos úteis para uma operação de comércio eletrônico.
 
-## Programming Languages Used
-- **Java**: Primary programming language used for the backend service logic.
+## Estrutura do Projeto
 
-## Dependencies and Installation Instructions
-### Key Dependencies
-- **Spring Boot**: Framework for building stand-alone, production-grade Spring-based Applications.
-- **Maven**: Dependency management.
-- **Lombok**: Automates logging variable definitions.
-- **H2 Database Engine**: In-memory database.
-- **JUnit**: For unit testing.
+- `src/`
+  - `br.com.adacommerce.ecommerce/`
+    - `configure/` - Configurações gerais do sistema.
+    - `controller/` - Contém os controladores do sistema.
+    - `exceptions/` - Classes de exceção customizadas.
+    - `model/` - Entidades do modelo de domínio.
+    - `notifications/` - Envio de notificações (e-mail, etc.).
+    - `repository/` - Repositórios para gestão de dados.
+    - `service/` - Lógicas de negócio.
+    - `validators/` - Validadores para entrada de dados.
+    - `view/` - Interfaces e interações com o usuário.
+- `README.md`
 
-### Installation
-1. **Clone the repository**:
-    ```bash
-    git clone https://github.com/user/repo.git
-    cd repo
-    ```
-2. **Build the project using Maven**:
-    ```bash
-    mvn clean install
-    ```
-3. **Run the Spring Boot application**:
-    ```bash
-    mvn spring-boot:run
-    ```
+## Linguagens e Tecnologias Utilizadas
 
-## Running the Project and Executing Tests
-Run the application using:
+- **Java**: Linguagem de programação principal para desenvolvimento do back-end.
+- **JPA (Java Persistence API)**: API de persistência para gerenciamento de dados.
+- **iText**: Biblioteca utilizada para a geração de relatórios em PDF.
+
+## Dependências e Instruções de Instalação
+
+1. **Java Development Kit (JDK)** - É necessário ter o JDK instalado na máquina. Recomendamos o uso da versão 17 ou superior para compatibilidade.
+2. **Gerenciador de Dependências** - Utilização do Maven ou Gradle para gerenciar as dependências do projeto.
+
+### Como instalar:
+
+Clone o repositório do projeto:
+
 ```bash
-mvn spring-boot:run
+git clone https://github.com/seu_usuario/ada_commerce.git
+cd ada_commerce
 ```
-Execute tests with:
+
+Instale as dependências:
+
+Usando Maven:
+```bash
+mvn install
+```
+
+Usando Gradle:
+```bash
+gradle build
+```
+
+## Executando o Projeto
+
+Para executar o sistema, use o seguinte comando pelo Maven ou Gradle:
+
+Usando Maven:
+```bash
+mvn exec:java -Dexec.mainClass="br.com.adacommerce.ecommerce.ECommerceSystem"
+```
+
+Usando Gradle:
+```bash
+gradle run
+```
+
+## Executando Testes
+
+Usando Maven:
 ```bash
 mvn test
 ```
 
-## Code File Explanations
-### Main Classes
-- **`ECommerceSystem.java`**: The main class that starts up the e-commerce service. 
-- **`ECommerceController.java`**: Facilitates user interaction through a console-based menu system. Handles operations on customers, products, and orders.
-- **`Persistencia.java`**: Enum that lists supported persistence methods (MEMORY, FILE, DATABASE).
-- **`ClienteService.java`, `ProdutoService.java`, `VendaService.java`**: Service layers handling business logic related to clients, products, and sales.
-
-### Models
-- **`Cliente.java`**, **`Produto.java`**, **`Pedido.java`**: Domain models representing Clients, Products, and Orders, respectively.
-
-### Repositories
-- **`ClienteRepository.java`**, **`ProdutoRepository.java`**, **`PedidoRepository.java`**: Interfaces providing data access methods.
-
-## Usage Examples
-### Example of Creating an Order
-```java
-ECommerceController controller = new ECommerceController(new ClienteService(), new ProdutoService(), new VendaService());
-controller.iniciar();
+Usando Gradle:
+```bash
+gradle test
 ```
 
-## Best Practices and Contribution Guidelines
-- **Code Style**: Follow existing coding conventions and Java best practices. Use meaningful variable names and comments.
-- **Contributions**: Fork the repository, create a feature branch, and submit a Pull Request.
-- **Testing**: Write JUnit tests for new code modules.
-- **Documentation**: Update README.md with relevant changes.
+## Principais Classes e Funções
 
-For detailed instructions on contributing, see `CONTRIBUTING.md`. Please ensure all contributions are documented and include relevant unit tests.
+### `ECommerceController`
 
----
+- **Responsável pelo gerenciamento das operações do sistema**: Inclui funções para cadastro de clientes e produtos, criação de pedidos, adição de produtos a pedidos, finalização e pagamento de pedidos.
+
+### `Persistencia`
+
+- **Enum que define os métodos de persistência utilizados**: Opções incluem memória, arquivo e banco de dados.
+
+### `ClienteService`, `ProdutoService`, `VendaService`
+
+- **Classes de Serviço**: Contêm a lógica de negócios principal para operações no sistema.
+
+## Contribuindo
+
+Contribuições são sempre bem-vindas! Aqui estão algumas diretrizes que você deve seguir:
+
+1. **Use Fork e Pull Requests para contribuir**.
+2. **Siga as convenções de codificação** padrão para Java.
+3. **Escreva testes para novas funcionalidades e correções**.
+4. **Documente todas as mudanças significativas**.
+
+Para mais detalhes, consulte o arquivo `CONTRIBUTING.md`.
+
+## Licença
+
+Este projeto está licenciado sob a Licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
