@@ -1,88 +1,89 @@
-# ADA Commerce System README
+# README.md for AdaCommerce E-Commerce Project
 
-This is an e-commerce system designed for managing products, customers, and orders within an ADA Commerce platform. It consists of various services and components designed to handle the complex tasks associated with a modern e-commerce business, such as inventory management, orders, reporting, and customer management.
+## Table of Contents
+1. [Project Structure and Folders](#project-structure-and-folders)
+2. [Programming Languages Used](#programming-languages-used)
+3. [Dependencies and Installation Instructions](#dependencies-and-installation-instructions)
+4. [Running the Project and Executing Tests](#running-the-project-and-executing-tests)
+5. [Code File Explanations](#code-file-explanations)
+6. [Usage Examples](#usage-examples)
+7. [Best Practices and Contribution Guidelines](#best-practices-and-contribution-guidelines)
 
 ## Project Structure and Folders
-
-- `src/`
-  - `br.com.adacommerce.ecommerce/`
-    - `controller/` - Contains the `ECommerceController` responsible for managing user interactions.
-    - `exceptions/` - Custom exception classes like `BusinessException`, `ValidationException`, etc.
-    - `model/` - Domain models/entities such as `Cliente`, `Pedido`, `Produto`.
-    - `repository/` - Data access layers, repository interfaces and implementations.
-    - `service/` - Business logic handlers like `ClienteService`, `VendaService`, `ProdutoService`.
-    - `utils/` - Helper classes such as `DocumentoValidator`, `EmailValidator`.
-    - `validators/` - Validators like `EstoqueValidator`.
-- `resources/` - Configuration files and resources that are used within the application.
-- `docs/` - Additional documentation including setup guidelines and API description.
-- `tests/` - Test files for unit and integration tests.
+The project follows a standard Maven project structure:
+- `src/main/java`: Contains all Java source code.
+  - `br.com.adacommerce.ecommerce`: Base package.
+    - `config`: Configuration settings and enums.
+    - `controller`: Controllers to handle user requests.
+    - `exceptions`: Custom exceptions.
+    - `model`: Domain models.
+    - `repository`: Interfaces for data access logic.
+    - `service`: Business logic and service layer.
+    - `validators`: Input validation logic.
+- `src/test/java`: Contains all test code.
 
 ## Programming Languages Used
+- **Java**: Primary programming language used for the backend service logic.
 
-- **Java** - The primary programming language used for building the application.
+## Dependencies and Installation Instructions
+### Key Dependencies
+- **Spring Boot**: Framework for building stand-alone, production-grade Spring-based Applications.
+- **Maven**: Dependency management.
+- **Lombok**: Automates logging variable definitions.
+- **H2 Database Engine**: In-memory database.
+- **JUnit**: For unit testing.
 
-## Dependencies and Installation Guide
+### Installation
+1. **Clone the repository**:
+    ```bash
+    git clone https://github.com/user/repo.git
+    cd repo
+    ```
+2. **Build the project using Maven**:
+    ```bash
+    mvn clean install
+    ```
+3. **Run the Spring Boot application**:
+    ```bash
+    mvn spring-boot:run
+    ```
 
-### Required Tools:
+## Running the Project and Executing Tests
+Run the application using:
+```bash
+mvn spring-boot:run
+```
+Execute tests with:
+```bash
+mvn test
+```
 
-- Java Development Kit (JDK) - Version 11 or higher.
-- Apache Maven - Dependency management and build tool.
+## Code File Explanations
+### Main Classes
+- **`ECommerceSystem.java`**: The main class that starts up the e-commerce service. 
+- **`ECommerceController.java`**: Facilitates user interaction through a console-based menu system. Handles operations on customers, products, and orders.
+- **`Persistencia.java`**: Enum that lists supported persistence methods (MEMORY, FILE, DATABASE).
+- **`ClienteService.java`, `ProdutoService.java`, `VendaService.java`**: Service layers handling business logic related to clients, products, and sales.
 
-### Libraries:
+### Models
+- **`Cliente.java`**, **`Produto.java`**, **`Pedido.java`**: Domain models representing Clients, Products, and Orders, respectively.
 
-- **Spring Framework** - For Dependency Injection.
-- **Hibernate ORM & JPA** - For database operations.
-- **iText** for PDF generation.
-- **JavaMail API** for email handling.
-
-### Steps to Setup:
-
-1. **Clone the repository:**
-   ```sh
-   git clone https://github.com/yourusername/ada-commerce-system.git
-   cd ada-commerce-system
-   ```
-2. **Build the project:**
-   ```sh
-   mvn clean install
-   ```
-3. **Run the application:**
-   ```sh
-   java -jar target/ecommerce-1.0-SNAPSHOT.jar
-   ```
-
-## How to Run the Project and Execute Tests
-
-- **Running the project:** Follow the installation steps above to build and run the project.
-- **Executing tests:**
-  ```sh
-  mvn test
-  ```
-
-## Key Code Files Explanation
-
-- `ECommerceController.java`: The main controller class orchestrating user interaction handling, integrating services like `ClienteService`, `ProdutoService`, and managing user input and output through console.
-- `ClienteService.java`, `VendaService.java`, `ProdutoService.java`: Services doing the heavy lifting for business logic specific to Clients, Sales, and Products respectively.
-- `Repository` interfaces in `br.com.adacommerce.ecommerce.repository` manage data persistence.
+### Repositories
+- **`ClienteRepository.java`**, **`ProdutoRepository.java`**, **`PedidoRepository.java`**: Interfaces providing data access methods.
 
 ## Usage Examples
+### Example of Creating an Order
+```java
+ECommerceController controller = new ECommerceController(new ClienteService(), new ProdutoService(), new VendaService());
+controller.iniciar();
+```
 
-To operate the e-commerce system, start the application and use the console interface provided by `ECommerceController` to interact with the system such as creating orders, adding products, and managing customers.
+## Best Practices and Contribution Guidelines
+- **Code Style**: Follow existing coding conventions and Java best practices. Use meaningful variable names and comments.
+- **Contributions**: Fork the repository, create a feature branch, and submit a Pull Request.
+- **Testing**: Write JUnit tests for new code modules.
+- **Documentation**: Update README.md with relevant changes.
 
-## Best Practices and Contribution
+For detailed instructions on contributing, see `CONTRIBUTING.md`. Please ensure all contributions are documented and include relevant unit tests.
 
-**Code Standards:**
-- Follow Java naming conventions.
-- Use clear and understandable variable names.
-- Comment your code where necessary.
-
-**Contribution Guide:**
-
-1. **Fork the repository** and create your branch from `main`.
-2. **Make your changes** and test.
-3. **Write clear commit messages** describing your changes.
-4. **Open a pull request** with the changes.
-
-## Conclusion
-
-The ADA Commerce system is structured to be robust, providing a comprehensive suite of functionalities for an e-commerce platform. Its modular architecture ensures that adding new features or modifying existing ones is as streamlined as possible.
+---
